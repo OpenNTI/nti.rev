@@ -49,6 +49,7 @@ setup(
         'nti.schema',
         'six',
         'zope.component',
+        'zope.i18nmessageid',
         'zope.interface',
         'zope.schema',
     ],
