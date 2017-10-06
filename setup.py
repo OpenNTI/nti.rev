@@ -8,6 +8,7 @@ entry_points = {
 
 TESTS_REQUIRE = [
     'nti.testing',
+    'zope.dottedname',
     'zope.testrunner',
 ]
 
@@ -46,15 +47,20 @@ setup(
     tests_require=TESTS_REQUIRE,
     install_requires=[
         'setuptools',
+        'nti.schema',
         'six',
         'zope.component',
-        'zope.deferredimport',
-        'zope.deprecation',
+        'zope.i18nmessageid',
         'zope.interface',
-        'zope.schema'
+        'zope.schema',
     ],
     extras_require={
         'test': TESTS_REQUIRE,
+        'docs': [
+            'Sphinx',
+            'repoze.sphinx.autointerface',
+            'sphinx_rtd_theme',
+        ],
     },
     entry_points=entry_points,
 )
