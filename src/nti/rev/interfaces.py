@@ -82,7 +82,7 @@ class IAuthorization(interface.Interface):
                               required=True)
 
     user_API_key = TextLine(title=u'The user API key',
-                            desciption=u"""This is a secret key specific to a Rev user, 
+                            description=u"""This is a secret key specific to a Rev user, 
                             which identifies the user account under whose privileges 
                             the requested operation executes.""",
                             required=True)
