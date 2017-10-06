@@ -1,0 +1,41 @@
+Metadata-Version: 1.1
+Name: nti.rev
+Version: 1.0.0.dev0
+Summary: NTI Rev
+Home-page: https://github.com/NextThought/nti.rev
+Author: Ryan Browning
+Author-email: ryan.browning@nextthought.com
+License: Apache
+Description: ==========
+         nti.rev
+        ==========
+        
+        .. image:: https://travis-ci.org/NextThought/nti.rev.svg?branch=master
+            :target: https://travis-ci.org/NextThought/nti.rev
+        
+        .. image:: https://coveralls.io/repos/github/NextThought/nti.rev/badge.svg?branch=master
+            :target: https://coveralls.io/github/NextThought/nti.rev?branch=master
+        
+        
+        =========
+         Changes
+        =========
+        
+        
+        1.0.0 (unreleased)
+        ==================
+        
+        - First PyPI release.
+        - Add support for Python 3.
+        
+Keywords: Rev
+Platform: UNKNOWN
+Classifier: Intended Audience :: Developers
+Classifier: Natural Language :: English
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
