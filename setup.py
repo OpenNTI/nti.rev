@@ -55,9 +55,6 @@ setup(
     ],
     extras_require={
         'test': TESTS_REQUIRE,
-    },
-    extras_require={
-        'test': TESTS_REQUIRE,
         'docs': [
             'Sphinx',
             'repoze.sphinx.autointerface',
