@@ -33,6 +33,8 @@ class IRevClient(interface.Interface):
     def upload_source_file(source_file):
         """
         Upload a source file to be used in an order.
+        
+        FIXME: documentation - input, output, expected error cases and what exceptions might be raised
         """
 
     def submit_transcription_order(order):
@@ -53,6 +55,8 @@ class IRevClient(interface.Interface):
     def get_orders():
         """
         Get paged list of orders for user.
+        
+        FIXME: take inputs, define them with default args so they don't have to be specified (use Rev default args)
         """
 
     def cancel_order(ordernum):
@@ -74,6 +78,8 @@ class IRevClient(interface.Interface):
 class ICredentials(interface.Interface):
     """
     Security and authentication keys used to access the Rev API
+    
+    # FIXME: Split into two different interfaces IClientKey, IUserKey, and shared interface
     """
 
     client_API_key = TextLine(title=u'The client API key',
@@ -199,6 +205,7 @@ class IMonologueElement(interface.Interface):
     # FIXME: schema?
     # FIXME: Indicate required for tag elements but not required for text
     # elements
+    # FIXME: Internally datetime object
     timestamp = TextLine(title=u'The timestamp')
 
 
@@ -285,7 +292,7 @@ class INotification(interface.Interface):
                    title=u'Specifies which notifications are sent',
                    required=False)
 
-
+# FIXME? nti.interfaces ILinks (leave for now), might change into NTILinks
 class ILink(interface.Interface):
     """
     Link with URL of the resource for getting attachment content
@@ -330,7 +337,7 @@ class IAttachment(interface.Interface):
     kind = Choice(vocabulary=ATTACHMENT_KIND_VOCABULARY,
                   title=u'The kind of attachment',
                   required=True)
-
+    #FIXME: filename (name is not descriptive) but leave for now
     name = TextLine(title=u'Filename for the attachment',
                     required=True)
 
@@ -416,6 +423,7 @@ class IOrderDetails(interface.Interface):
                           required=True)
 
     # TODO: Rounded to the nearest whole dollar? Convert to cents?
+    # Probably fractional, rounded to two decimal places
     # "The price unit in Dollars and it shows default order price" what does default order price mean?
     price = Number(title=u'Total cost of the order (in dollars)',
                    required=True)
@@ -611,9 +619,6 @@ class ICaptionOrder(ICaptionOrderRequest, ICaptionOrderDetails, IOrder):
     """
     A caption order
     """
-
-
-# FIXME: Ambiguous name?
 
 
 class ITranscription(interface.Interface):
