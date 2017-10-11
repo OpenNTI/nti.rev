@@ -71,7 +71,7 @@ class IRevClient(interface.Interface):
         """
 
 
-class IAuthorization(interface.Interface):
+class ICredentials(interface.Interface):
     """
     Security and authentication keys used to access the Rev API
     """
