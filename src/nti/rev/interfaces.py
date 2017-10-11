@@ -71,7 +71,7 @@ class IRevClient(interface.Interface):
         """
 
 
-class IAuthorization(interface.Interface):
+class ICredentials(interface.Interface):
     """
     Security and authentication keys used to access the Rev API
     """
@@ -383,13 +383,6 @@ class IOrderRequest(interface.Interface):
                           required=False)
 
 
-class IOrderResponse(interface.Interface):
-    """
-    An object providing information for an order response
-
-    # TODO: define fields
-    """
-
 #: Completed and Cancelled are the only status values guaranteed not to
 #: change in v1 of the API.
 
@@ -440,7 +433,7 @@ class IOrderDetails(interface.Interface):
                     required=True)
 
 
-class IOrder(IOrderRequest, IOrderResponse):
+class IOrder(IOrderRequest, IOrderDetails):
     """
     An order
     """
