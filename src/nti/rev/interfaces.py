@@ -75,23 +75,33 @@ class IRevClient(interface.Interface):
         """
 
 
-class ICredentials(interface.Interface):
+class IClientAPIKey(interface.Interface):
     """
-    Security and authentication keys used to access the Rev API
+    A secret key specific to each partner that wishes to use the Rev API
+    """
     
-    # FIXME: Split into two different interfaces IClientKey, IUserKey, and shared interface
-    """
-
     client_API_key = TextLine(title=u'The client API key',
                               description=u"""This is a secret key specific to each partner 
                               that wishes to use the Rev API.""",
                               required=True)
 
+
+class IUserAPIKey(interface.Interface):
+    """
+    A secret key specific to a Rev user
+    """
+    
     user_API_key = TextLine(title=u'The user API key',
                             description=u"""This is a secret key specific to a Rev user, 
                             which identifies the user account under whose privileges 
                             the requested operation executes.""",
                             required=True)
+
+
+class ICredentials(IClientAPIKey, IUserAPIKey):
+    """
+    Security and authentication keys used to access the Rev API
+    """
 
 
 class ISourceFileUpload(interface.Interface):
