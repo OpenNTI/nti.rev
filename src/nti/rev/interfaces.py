@@ -207,16 +207,12 @@ class IMonologueElement(interface.Interface):
                  For tag elements, value contains the annotation type.""",
                  required=True)
 
-    #: Timestamp format is hh:mm:sss,fff
-    #: where fff represents milliseconds
-    #: Text elements may or may not contain a timestamp.
-    #: Tag elements require a timestamp.
-
-    # FIXME: schema?
-    # FIXME: Indicate required for tag elements but not required for text
-    # elements
-    # FIXME: Internally datetime object
-    timestamp = TextLine(title=u'The timestamp')
+    # FIXME: Required for tag elements but not required for text elements
+    timestamp = DateTime(title=u'The timestamp',
+                         description=u"""Rev uses timestamp format hh:mm:sss,fff
+                         where fff represent milliseconds.
+                         Text elements may or may not contain a timestamp.
+                         Tag elements require a timestamp.""")
 
 
 class IMonologueElements(interface.Interface):
@@ -302,7 +298,7 @@ class INotification(interface.Interface):
                    title=u'Specifies which notifications are sent',
                    required=False)
 
-# FIXME? nti.interfaces ILinks (leave for now), might change into NTILinks
+# FIXME? nti.interfaces ILinks, might change into NTILinks (leave for now)
 class ILink(interface.Interface):
     """
     Link with URL of the resource for getting attachment content
@@ -347,7 +343,8 @@ class IAttachment(interface.Interface):
     kind = Choice(vocabulary=ATTACHMENT_KIND_VOCABULARY,
                   title=u'The kind of attachment',
                   required=True)
-    #FIXME: filename (name is not descriptive) but leave for now
+    # FIXME? "name" is not description, change to "filename?"
+    # JSON object uses "name," so leave for now
     name = TextLine(title=u'Filename for the attachment',
                     required=True)
 
@@ -499,8 +496,6 @@ class ITranscriptionOrderRequest(IOrderRequest):
                                    description=u"""Provides information on what needs to be transcribed 
                                    and allows for any transcription options to be set""",
                                    required=True)
-
-# FIXME: Ambiguous name?
 
 
 class ICaption(interface.Interface):
