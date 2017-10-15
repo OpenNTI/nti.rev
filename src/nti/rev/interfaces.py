@@ -30,33 +30,134 @@ class IRevClient(interface.Interface):
     Handles Rev order operations
     """
 
-    def upload_source_file(source_file):
+    """
+    FIXME: documentation - input, output, expected error cases and what exceptions might be raised
+    """
+    def __init__(authorization):
         """
-        Upload a source file to be used in an order.
+        """
+
+
+    def upload_source_file(source_file_upload):
+        """
+        Upload an ISourceFileUpload to create a new ISourceFileInput to be used in an order.
         
-        FIXME: documentation - input, output, expected error cases and what exceptions might be raised
+        Args:
+            source_file_upload (ISourceFileUpload): The source file to upload to be used in an order.
+        
+        Returns:
+            ISourceFileInput: The newly uploaded source file to be used in an order.
+        
+        Raises:
+            UnsupportedContentType: If the content type of the media is not currently supported by Rev system.
+            CouldNotRetrieveFile: If Rev could not retrieve the file from the specified location.
+            InvalidMultipartRequest: If the multipart request did not contain exactly one file part or was otherwise malformed.
+            UnspecifiedFilename: If the filename for the media was not specified explicitly and could not be determined automatically.
+            UnspecifiedURL: If the URL for the media was not specified.
+            
         """
 
-    def submit_transcription_order(order):
+    def submit_transcription_order(transcription_order_request):
         """
-        Submit a new transcription order.
+        Submit a new ITranscriptionOrder given an ITranscriptionOrderRequest.
+        
+        Args:
+            transcription_order_request (ITranscriptionOrderRequest): The order request for a new transcription order.
+        
+        Returns:
+            ITranscriptionOrder: The newly created transcription order.
+        
+        Raises:
+            MissingInputs: If the order request did not contain any input media.
+            InvalidInput: If one of the input media URIs is invalid (e.g. does not identify valid uploaded media).
+            MultipleServiceOptionsSpecified: If both transcription options and caption options are included in the request.
+                Currently, an order can be made for only one of the two services Rev offers (transcription or caption).
+            ServiceTypeNotSpecified: If transcription options for order are not specified.
+            ExternalLinkAndURISpecified: If both external link and URI are set for input media.
+            InputLocationNotSpecified: If neither external link or URI are set for input media.
+            CannotConnectToExternalLink: If Rev cannot connect to external link provided.
+            InvalidMediaLength: If input media length is not provided and Rev is unable to calculate it automatically
+                or if input media length is not a positive integer.
+            ReferenceNumberTooLong: If the reference number provided is longer than 256 characters.
+            IneligibleForBalancePayments: If the user on whose behalf the order request was made is not eligible for paying using account balance.
+            AccountBalanceLimitExceeded: If the order request specified payment using account balance but doing so would exceed the user's balance limit.
+            FieldValidationErrors: If one or more of the fields are in the wrong format.
+        
         """
 
-    def submit_caption_order(order):
+    def submit_caption_order(caption_order_request):
         """
-        Submit a new caption order.
+        Submit a new ICaptionOrder given an ICaptionOrderRequest.
+        
+        Args:
+            caption_order_request (ICaptionOrderRequest): The order request for a new caption order.
+        
+        Returns:
+            ICaptionOrder: The newly created caption order.
+        
+        Raises:
+            MissingInputs: If the order request did not contain any input media.
+            InvalidInput: If one of the input media URIs is invalid (e.g. does not identify valid uploaded media).
+            MultipleServiceOptionsSpecified: If both transcription options and caption options are included in the request.
+                Currently, an order can be made for only one of the two services Rev offers (transcription or caption).
+            ServiceTypeNotSpecified: If caption options for order are not specified.
+            ExternalLinkAndURISpecified: If both external link and URI are set for input media.
+            InputLocationNotSpecified: If neither external link or URI are set for input media.
+            CannotConnectToExternalLink: If Rev cannot connect to external link provided.
+            InvalidMediaLength: If input media length is not provided and Rev is unable to calculate it automatically
+                or if input media length is not a positive integer.
+            InvalidLanguageCode: If one or more of the provided language codes are invalid.
+            IncompatibleLanguage: If some of the selected output file formats do not support one or more of the specified languages.
+                For example, Scenarist (Scc), MacCaptions (Mcc) and CheetahCap (CAP) are incompatible with languages that use non-Latin alphabets.
+            ReferenceNumberTooLong: If the reference number provided is longer than 256 characters.
+            IneligibleForBalancePayments: If the user on whose behalf the order request was made is not eligible for paying using account balance.
+            AccountBalanceLimitExceeded: If the order request specified payment using account balance but doing so would exceed the user's balance limit.
+            FieldValidationErrors: If one or more of the fields are in the wrong format.
+        
         """
 
     def get_order(ordernum):
         """
-        Get detailed information about a specific order.
+        Get the IOrder detailed information for the order with the given order number.
+        
+        Args:
+            ordernum (str): The order number of the order to retrieve.
+        
+        Returns:
+            IOrder: The order details for the order with the given order number.
+        
+        Raises:
+            OrderNotFound: If the order with the given order number is not found or does not belong to the user.
+            
         """
 
-    def get_orders():
+    def get_orders(pagenum=1, pageSize=25, orderNumber=NULL, referenceId=NULL):
         """
-        Get paged list of orders for user.
+        Get the paged list IOrders for user, optionally getting orders with specific order number or reference ID.
         
-        FIXME: take inputs, define them with default args so they don't have to be specified (use Rev default args)
+        Args:
+            pagenum (int, optional): The number of the page of orders to return. Defaults to page 1.
+            pageSize (int, optional): The number of orders per page to return. Page size must be between 5 and 100.
+                Defaults to 25 orders per page.
+            orderNumber (str, optional): The order number of the order to retrieve. 
+                Must not be specified if clientRef is specified. 
+                Defaults to returning all orders.
+            referenceId (str, optional): The reference ID as used in your application of the order to retrieve.
+                Must not be specified if orderNumber is specified.
+                Defaults to returning all orders.
+        
+        Returns:
+            IOrders: The list of orders for a user returned in a paged manner.
+                The returned result will indicate the total number of orders, as well as number of orders per page and 
+                the number of orders in the requested page, which enables a client to iteratively retrieve all orders for the user if desired.
+                The results are ordered in reverse chronological order by placed on date.
+                
+                Each order entity in the list contains summary information for the order - it omits comments and attachments.
+                To get those, call get_order(ordernum) with the appropriate order number.
+                
+        Raises:
+            OrderNumberAndReferenceIdSpecified: If both orderNumber and referenceId are specified.
+        
         """
 
     def cancel_order(ordernum):
@@ -98,7 +199,7 @@ class IUserAPIKey(interface.Interface):
                             required=True)
 
 
-class ICredentials(IClientAPIKey, IUserAPIKey):
+class IAuthorization(IClientAPIKey, IUserAPIKey):
     """
     Security and authentication keys used to access the Rev API
     """
