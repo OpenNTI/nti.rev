@@ -27,71 +27,224 @@ from nti.schema.field import ValidURI
 
 class IRevClient(interface.Interface):
     """
-    Handles Rev order operations
+    Handles Rev order operations.
     """
 
-    def upload_source_file(source_file):
+    def __init__(authorization):
         """
-        Upload a source file to be used in an order.
+        Args:
+            authorization (:obj:`IAuthorization`): The client and user API keys.
         
-        FIXME: documentation - input, output, expected error cases and what exceptions might be raised
         """
 
-    def submit_transcription_order(order):
+
+    def upload_source_file(source_file_upload):
         """
-        Submit a new transcription order.
+        Upload an ISourceFileUpload to create a new ISourceFileInput to be used in an order.
+        
+        Args:
+            source_file_upload (:obj:`ISourceFileUpload`): The source file to upload to be used in an order.
+        
+        Returns:
+            (:obj:`ISourceFileInput`): The newly uploaded source file to be used in an order.
+        
+        Raises:
+            UnsupportedContentType: If the content type of the media is not currently supported by Rev system.
+            CouldNotRetrieveFile: If Rev could not retrieve the file from the specified location.
+            InvalidMultipartRequest: If the multipart request did not contain exactly one file part or was otherwise malformed.
+            UnspecifiedFilename: If the filename for the media was not specified explicitly and could not be determined automatically.
+            UnspecifiedURL: If the URL for the media was not specified.
+            
         """
 
-    def submit_caption_order(order):
+    def submit_transcription_order(transcription_order_request):
         """
-        Submit a new caption order.
+        Submit a new ITranscriptionOrder given an ITranscriptionOrderRequest.
+        
+        Args:
+            transcription_order_request (:obj:`ITranscriptionOrderRequest`): The order request for a new transcription order.
+        
+        Returns:
+            (:obj:`ITranscriptionOrder`): The newly created transcription order.
+        
+        Raises:
+            MissingInputs: If the order request did not contain any input media.
+            InvalidInput: If one of the input media URIs is invalid (e.g. does not identify valid uploaded media).
+            MultipleServiceOptionsSpecified: If both transcription options and caption options are included in the request.
+                Currently, an order can be made for only one of the two services Rev offers (transcription or caption).
+            ServiceTypeNotSpecified: If transcription options for order are not specified.
+            ExternalLinkAndURISpecified: If both external link and URI are set for input media.
+            InputLocationNotSpecified: If neither external link or URI are set for input media.
+            CannotConnectToExternalLink: If Rev cannot connect to external link provided.
+            InvalidMediaLength: If input media length is not provided and Rev is unable to calculate it automatically
+                or if input media length is not a positive integer.
+            ReferenceNumberTooLong: If the reference number provided is longer than 256 characters.
+            IneligibleForBalancePayments: If the user on whose behalf the order request was made is not eligible for paying using account balance.
+            AccountBalanceLimitExceeded: If the order request specified payment using account balance but doing so would exceed the user's balance limit.
+            FieldValidationErrors: If one or more of the fields are in the wrong format.
+        
+        """
+
+    def submit_caption_order(caption_order_request):
+        """
+        Submit a new ICaptionOrder given an ICaptionOrderRequest.
+        
+        Args:
+            caption_order_request (:obj:`ICaptionOrderRequest`): The order request for a new caption order.
+        
+        Returns:
+            (:obj:`ICaptionOrder`): The newly created caption order.
+        
+        Raises:
+            MissingInputs: If the order request did not contain any input media.
+            InvalidInput: If one of the input media URIs is invalid (e.g. does not identify valid uploaded media).
+            MultipleServiceOptionsSpecified: If both transcription options and caption options are included in the request.
+                Currently, an order can be made for only one of the two services Rev offers (transcription or caption).
+            ServiceTypeNotSpecified: If caption options for order are not specified.
+            ExternalLinkAndURISpecified: If both external link and URI are set for input media.
+            InputLocationNotSpecified: If neither external link or URI are set for input media.
+            CannotConnectToExternalLink: If Rev cannot connect to external link provided.
+            InvalidMediaLength: If input media length is not provided and Rev is unable to calculate it automatically
+                or if input media length is not a positive integer.
+            InvalidLanguageCode: If one or more of the provided language codes are invalid.
+            IncompatibleLanguage: If some of the selected output file formats do not support one or more of the specified languages.
+                For example, Scenarist (Scc), MacCaptions (Mcc) and CheetahCap (CAP) are incompatible with languages that use non-Latin alphabets.
+            ReferenceNumberTooLong: If the reference number provided is longer than 256 characters.
+            IneligibleForBalancePayments: If the user on whose behalf the order request was made is not eligible for paying using account balance.
+            AccountBalanceLimitExceeded: If the order request specified payment using account balance but doing so would exceed the user's balance limit.
+            FieldValidationErrors: If one or more of the fields are in the wrong format.
+        
         """
 
     def get_order(ordernum):
         """
-        Get detailed information about a specific order.
+        Get the IOrder detailed information for the order with the given order number.
+        
+        Args:
+            ordernum (str): The order number of the order to retrieve.
+        
+        Returns:
+            (:obj:`IOrder`): The order details for the order with the given order number.
+        
+        Raises:
+            NotFound: If the order with the given order number is not found or does not belong to the user.
+            
         """
 
-    def get_orders():
+    def get_orders(pagenum=1, pageSize=25, orderNumber=None, referenceId=None):
         """
-        Get paged list of orders for user.
+        Get the paged list IOrders for user, optionally getting orders with specific order number or reference ID.
         
-        FIXME: take inputs, define them with default args so they don't have to be specified (use Rev default args)
+        Args:
+            pagenum (int, optional): The number of the page of orders to return. Defaults to page 1.
+            pageSize (int, optional): The number of orders per page to return. Page size must be between 5 and 100.
+                Defaults to 25 orders per page.
+            orderNumber (str, optional): The order number of the order to retrieve. 
+                Must not be specified if clientRef is specified. 
+                Defaults to returning all orders.
+            referenceId (str, optional): The reference ID as used in your application of the order to retrieve.
+                Must not be specified if orderNumber is specified.
+                Defaults to returning all orders.
+        
+        Returns:
+            (:obj:`IOrders`): The list of orders for a user returned in a paged manner.
+                The returned result will indicate the total number of orders, as well as number of orders per page and 
+                the number of orders in the requested page, which enables a client to iteratively retrieve all orders for the user if desired.
+                The results are ordered in reverse chronological order by placed on date.
+                
+                Each order entity in the list contains summary information for the order - it omits comments and attachments.
+                To get those, call get_order(ordernum) with the appropriate order number.
+                
+        Raises:
+            OrderNumberAndReferenceIdSpecified: If both orderNumber and referenceId are specified.
+        
         """
 
     def cancel_order(ordernum):
         """
-        Cancel an order.
+        Cancel the IOrder with the given order number.
+        
+        Orders can only be cancelled if work on them has not begun yet.
+        
+        Args:
+            ordernum (str): The order number of the order to be cancelled.
+        
+        Returns:
+            bool: True if successful, False otherwise.
+        
+        Raises:
+            NotFound: If the order with the given order number is not found.
+            CancelForbidden: If the order cannot be cancelled because work on the order has already begun.
+            
         """
 
     def get_attachment(attachment_id):
         """
-        Get metadata about an order attachment.
+        Get the IAttachment for the given attachment ID.
+                
+        Args:
+            attachment_id (str): The ID of the attachment to retrieve.
+        
+        Returns:
+            (:obj:`IAttachment`): The attachment with the given attachment ID.
+        
+        Raises:
+            NotFound: If the attachment with the given attachment ID is not found.
+            
         """
 
-    def get_attachment_content(attachment_id):
+    def get_attachment_content(attachment_id, file_format):
         """
-        Get the raw data for the attachment with given ID.
+        Get the IAttachmentContent for the IAttachment with the given ID.
+        
+        Use this method to download either finished output file(s) 
+        (transcripts or captions, depending on the type of order you placed),
+        or the source file(s) for an order.
+        
+        Args:
+            attachment_id (str): The ID of the attachment for which to retrieve its content.
+            file_format (str): The requested file format for the attachment content.
+                Defaults to Microsoft Word (.docx) for transcripts.
+                Defaults to SubRip (.srt) for captions.
+            
+        Returns:
+            (:obj:`IAttachmentContent`): The content of the attachment with the given ID.
+        
+        Raises:
+            NotFound: If the attachment with the given attachment ID is not found.
+            UnsupportedFileFormat: If none of the requested representations are available for the attachments
+                or the file format specified for a source file does not match the original format.
+            
         """
 
 
-class ICredentials(interface.Interface):
+class IClientAPIKey(interface.Interface):
     """
-    Security and authentication keys used to access the Rev API
+    A secret key specific to each partner that wishes to use the Rev API
+    """
     
-    # FIXME: Split into two different interfaces IClientKey, IUserKey, and shared interface
-    """
-
     client_API_key = TextLine(title=u'The client API key',
                               description=u"""This is a secret key specific to each partner 
                               that wishes to use the Rev API.""",
                               required=True)
 
+
+class IUserAPIKey(interface.Interface):
+    """
+    A secret key specific to a Rev user
+    """
+    
     user_API_key = TextLine(title=u'The user API key',
                             description=u"""This is a secret key specific to a Rev user, 
                             which identifies the user account under whose privileges 
                             the requested operation executes.""",
                             required=True)
+
+
+class IAuthorization(IClientAPIKey, IUserAPIKey):
+    """
+    Security and authentication keys used to access the Rev API
+    """
 
 
 class ISourceFileUpload(interface.Interface):
@@ -197,16 +350,12 @@ class IMonologueElement(interface.Interface):
                  For tag elements, value contains the annotation type.""",
                  required=True)
 
-    #: Timestamp format is hh:mm:sss,fff
-    #: where fff represents milliseconds
-    #: Text elements may or may not contain a timestamp.
-    #: Tag elements require a timestamp.
-
-    # FIXME: schema?
-    # FIXME: Indicate required for tag elements but not required for text
-    # elements
-    # FIXME: Internally datetime object
-    timestamp = TextLine(title=u'The timestamp')
+    # FIXME: Required for tag elements but not required for text elements
+    timestamp = DateTime(title=u'The timestamp',
+                         description=u"""Rev uses timestamp format hh:mm:sss,fff
+                         where fff represent milliseconds.
+                         Text elements may or may not contain a timestamp.
+                         Tag elements require a timestamp.""")
 
 
 class IMonologueElements(interface.Interface):
@@ -292,7 +441,7 @@ class INotification(interface.Interface):
                    title=u'Specifies which notifications are sent',
                    required=False)
 
-# FIXME? nti.interfaces ILinks (leave for now), might change into NTILinks
+# FIXME? nti.interfaces ILinks, might change into NTILinks (leave for now)
 class ILink(interface.Interface):
     """
     Link with URL of the resource for getting attachment content
@@ -332,12 +481,16 @@ ATTACHMENT_KIND_VOCABULARY = SimpleVocabulary(
 class IAttachment(interface.Interface):
     """
     An attachment
+    
+    Attachments are either source files (audio or video for transcriptions orders, videos for caption orders)
+    or output files (transcripts or captions, depending on the type of order).
     """
 
     kind = Choice(vocabulary=ATTACHMENT_KIND_VOCABULARY,
                   title=u'The kind of attachment',
                   required=True)
-    #FIXME: filename (name is not descriptive) but leave for now
+    # FIXME? "name" is not description, change to "filename?"
+    # JSON object uses "name," so leave for now
     name = TextLine(title=u'Filename for the attachment',
                     required=True)
 
@@ -489,8 +642,6 @@ class ITranscriptionOrderRequest(IOrderRequest):
                                    description=u"""Provides information on what needs to be transcribed 
                                    and allows for any transcription options to be set""",
                                    required=True)
-
-# FIXME: Ambiguous name?
 
 
 class ICaption(interface.Interface):
