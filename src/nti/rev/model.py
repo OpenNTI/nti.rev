@@ -56,13 +56,16 @@ from nti.rev.interfaces import ITranscriptionOrder
 class ClientAPIKey(SchemaConfigured):
         
     createDirectFieldProperties(IClientAPIKey)
-    
-#     __external_class_name__ = "ClientAPIKey"
         
-#     mimeType = mime_type = 'application/vnd.nextthought.rev.clientapikey'
-    
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
+
+@NoPickle
+@interface.implementer(IUserAPIKey)
+class UserAPIKey(SchemaConfigured):
         
-    
-    
+    createDirectFieldProperties(IUserAPIKey)
+        
+    def __init__(self, *args, **kwargs):
+        SchemaConfigured.__init__(self, *args, **kwargs)
+

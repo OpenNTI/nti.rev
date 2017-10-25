@@ -13,7 +13,8 @@
 	<include package="nti.externalization" file="meta.zcml" />
 	<include package="nti.externalization" />
 	<ext:registerAutoPackageIO
-		root_interfaces=".interfaces.IClientAPIKey"
+		root_interfaces=".interfaces.IClientAPIKey
+						 .interfaces.IUserAPIKey"
 		modules=".model" />
 	 
 </configure>
