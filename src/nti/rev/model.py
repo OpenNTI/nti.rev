@@ -18,7 +18,7 @@ from nti.schema.schema import SchemaConfigured
 
 from .interfaces import IClientAPIKey
 from .interfaces import IUserAPIKey
-from .interfaces import ICredentials
+from .interfaces import IAuthorization
 from .interfaces import ISourceFileUpload
 from .interfaces import IInput
 from .interfaces import ISourceFileInput
@@ -54,10 +54,12 @@ from .interfaces import ITranscriptionOrder
 @NoPickle
 @interface.implementer(IClientAPIKey)
 class ClientAPIKey(SchemaConfigured):
-    
-    createDirectFieldProperties(IClientAPIKey)
         
-    mimeType = mime_type = 'application/vnd.nextthought.rev.clientapikey'
+    createDirectFieldProperties(IClientAPIKey)
+    
+#     __external_class_name__ = "ClientAPIKey"
+        
+#     mimeType = mime_type = 'application/vnd.nextthought.rev.clientapikey'
     
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)

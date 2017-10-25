@@ -223,7 +223,7 @@ class IClientAPIKey(interface.Interface):
     A secret key specific to each partner that wishes to use the Rev API
     """
     
-    client_API_key = TextLine(title=u'The client API key',
+    client_api_key = TextLine(title=u'The client API key',
                               description=u"""This is a secret key specific to each partner 
                               that wishes to use the Rev API.""",
                               required=True)
@@ -234,7 +234,7 @@ class IUserAPIKey(interface.Interface):
     A secret key specific to a Rev user
     """
     
-    user_API_key = TextLine(title=u'The user API key',
+    user_api_key = TextLine(title=u'The user API key',
                             description=u"""This is a secret key specific to a Rev user, 
                             which identifies the user account under whose privileges 
                             the requested operation executes.""",
