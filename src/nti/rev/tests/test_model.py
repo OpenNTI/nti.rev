@@ -22,6 +22,7 @@ import unittest
 
 from nti.rev.model import ClientAPIKey
 from nti.rev.model import UserAPIKey
+from nti.rev.model import SourceFileUpload
 
 from nti.rev.tests import SharedConfiguringTestLayer
 
@@ -51,3 +52,17 @@ class TestExternalization(unittest.TestCase):
 
         new_io = self._internalize(external)
         assert_that(new_io, has_properties({'user_api_key': 'AAAOiFQ21PgbaVUDAU1tYH2ZEV8='}))
+
+#     def test_source_file_upload(self):
+#         source_file_upload = SourceFileUpload(content_type=u'video/mpeg',
+#                                               filename=u'video.mp4',
+#                                               url=u'http://www.server.com/file/987834')
+#         external = toExternalObject(source_file_upload)
+#         assert_that(external, has_entries({'content_type': 'video/mpeg',
+#                                            'filename': 'video.mp4',
+#                                            'url': 'http://www.server.com/file/987834'}))
+# 
+#         new_io = self._internalize(external)
+#         assert_that(new_io, has_properties({'content_type': 'video/mpeg',
+#                                            'filename': 'video.mp4',
+#                                            'url': 'http://www.server.com/file/987834'}))
