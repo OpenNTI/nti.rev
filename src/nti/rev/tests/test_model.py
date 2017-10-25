@@ -20,7 +20,7 @@ from nti.externalization.externalization import toExternalObject
 
 import unittest
 
-from ..model import ClientAPIKey
+from nti.rev.model import ClientAPIKey
 
 from nti.rev.tests import SharedConfiguringTestLayer
 
