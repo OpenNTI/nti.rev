@@ -18,11 +18,18 @@ from nti.externalization import internalization
 
 from nti.externalization.externalization import toExternalObject
 
+import datetime
 import unittest
 
 from nti.rev.model import ClientAPIKey
 from nti.rev.model import UserAPIKey
 from nti.rev.model import SourceFileUpload
+from nti.rev.model import SourceFileInput
+from nti.rev.model import Comment
+from nti.rev.model import Notification
+from nti.rev.model import OrderRequest
+from nti.rev.model import Link
+from nti.rev.model import Links
 
 from nti.rev.tests import SharedConfiguringTestLayer
 
@@ -55,6 +62,9 @@ class TestExternalization(unittest.TestCase):
         new_io = self._internalize(external)
         assert_that(new_io, has_properties({'user_api_key': 'AAAOiFQ21PgbaVUDAU1tYH2ZEV8='}))
 
+#     # TODO: Test this? Only consists of ClientAPIKey and UserAPIKey
+#     def test_authorization(self):
+
     def test_source_file_upload(self):
         source_file_upload = SourceFileUpload(content_type=u'video/mpeg',
                                               filename=u'video.mp4',
@@ -69,3 +79,71 @@ class TestExternalization(unittest.TestCase):
         assert_that(new_io, has_properties({'content_type': 'video/mpeg',
                                            'filename': 'video.mp4',
                                            'url': 'http://www.server.com/file/987834'}))
+
+#     # TODO: Do I need to test this? Input doesn't have any fields
+#     def test_input(self)
+
+    # FIXME: How to set audio_length_seconds to Number schema type?
+    def test_source_file_input(self):
+        source_file_input = SourceFileInput(audio_length_seconds=60,
+                                            uri=str('urn:rev:inputmedia:467432fds'))
+        external = toExternalObject(source_file_input)
+        assert_that(external, has_entries({'audio_length_seconds': 60,
+                                           'uri': 'urn:rev:inputmedia:467432fds',
+                                           'MimeType': 'application/vnd.nextthought.rev.sourcefileinput'}))
+ 
+        new_io = self._internalize(external)
+        assert_that(new_io, has_properties({'audio_length_seconds': 60,
+                                           'uri': 'urn:rev:inputmedia:467432fds'}))
+
+#     def test_comment(self):
+#         comment = Comment(by=u'John S.',
+#                           timestamp=datetime.datetime(year=2003, month=04, day=05, hour=12, minute=20, second=30, microsecond=123),
+#                           text=u'Please do it quickly')
+#         external = toExternalObject(comment)
+#         assert_that(external, has_entries({'by': 'John S.',
+#                                            'timestamp': '2003-04-05T12:20:30.123',
+#                                            'text': 'Please do it quickly',
+#                                            'MimeType': 'application/vnd.nextthought.rev.comment'}))
+
+    def test_notification(self):
+        notification = Notification(url=str('http://www.clientsite.com/orderupdate'),
+                                    level=u'Detailed')
+        external = toExternalObject(notification)
+        assert_that(external, has_entries({'url': 'http://www.clientsite.com/orderupdate',
+                                           'level': 'Detailed',
+                                           'MimeType': 'application/vnd.nextthought.rev.notification'}))
+
+        new_io = self._internalize(external)
+        assert_that(new_io, has_properties({'url': 'http://www.clientsite.com/orderupdate',
+                                           'level': 'Detailed'}))
+
+    # FIXME: How to test when entries contain other entries, like order_request has notification
+    def test_order_request(self):
+        order_request = OrderRequest(client_ref=u'XB432423',
+                                     notification=Notification(url=str('http://www.clientsite.com/orderupdate'), level=u'Detailed'))
+        external = toExternalObject(order_request)
+        assert_that(external, has_entries({'client_ref': 'XB432423',
+                                           'notification': {u'MimeType': 'application/vnd.nextthought.rev.notification', 'url': 'http://www.clientsite.com/orderupdate', u'Class': 'Notification', 'level': u'Detailed'},
+                                           'MimeType': 'application/vnd.nextthought.rev.orderrequest'}))
+
+    def test_link(self):
+        link = Link(rel=u'content',
+                    href=u'https://www.rev.com/api/v1/attachments/1C4AA')
+        external = toExternalObject(link)
+        assert_that(external, has_entries({'rel': 'content',
+                                           'href': 'https://www.rev.com/api/v1/attachments/1C4AA',
+                                           'MimeType': 'application/vnd.nextthought.rev.link'}))
+
+        new_io = self._internalize(external)
+        assert_that(new_io, has_properties({'rel': 'content',
+                                           'href': 'https://www.rev.com/api/v1/attachments/1C4AA'}))
+
+#     # FIXME: No 'links' key?
+#     def test_links(self):
+#         link = Link(rel=u'content',
+#                     href=u'https://www.rev.com/api/v1/attachments/1C4AA')
+#         links = Links(links=[link])
+#         external = toExternalObject(links)
+#         assert_that(external, has_entries({'links': {'link': {'rel': 'content', 'href': 'https://www.rev.com/api/v1/attachments/1C4AA'}},
+#                                                      'MimeType': 'application/vnd.nextthought.rev.links'}))
