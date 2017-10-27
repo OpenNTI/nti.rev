@@ -416,9 +416,11 @@ class IComment(interface.Interface):
     text = Text(title=u'The text of the comment',
                 required=True)
 
+# (the default) A notification is sent only when the order is complete
+NOTIFICATION_FINAL_ONLY = u'FinalOnly'
 
-NOTIFICATION_FINAL_ONLY = u'(the default) A notification is sent only when the order is complete'
-NOTIFICATION_DETAILED = u'A notification is sent whenever the order is in a new status or has a new comment'
+# A notification is sent whenever the order is in a new status or has a new comment
+NOTIFICATION_DETAILED = u'Detailed'
 
 NOTIFICATION_ITEMS = (NOTIFICATION_DETAILED,
                       NOTIFICATION_FINAL_ONLY)
