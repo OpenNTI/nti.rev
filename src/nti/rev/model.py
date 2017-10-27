@@ -57,6 +57,8 @@ class ClientAPIKey(SchemaConfigured):
 
     createDirectFieldProperties(IClientAPIKey)
 
+    mimeType = mime_type = 'application/vnd.nextthought.rev.clientapikey'
+
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
 
@@ -65,6 +67,8 @@ class ClientAPIKey(SchemaConfigured):
 class UserAPIKey(SchemaConfigured):
 
     createDirectFieldProperties(IUserAPIKey)
+
+    mimeType = mime_type = 'application/vnd.nextthought.rev.userapikey'
 
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
@@ -75,6 +79,8 @@ class Authorization(SchemaConfigured):
 
     createDirectFieldProperties(IAuthorization)
 
+    mimeType = mime_type = 'application/vnd.nextthought.rev.authorization'
+
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
 
@@ -83,6 +89,8 @@ class Authorization(SchemaConfigured):
 class SourceFileUpload(SchemaConfigured):
 
     createDirectFieldProperties(ISourceFileUpload)
+
+    mimeType = mime_type = 'application/vnd.nextthought.rev.sourcefileupload'
 
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
@@ -93,6 +101,8 @@ class Input(SchemaConfigured):
 
     createDirectFieldProperties(IInput)
 
+    mimeType = mime_type = 'application/vnd.nextthought.rev.input'
+
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
 
@@ -101,6 +111,8 @@ class Input(SchemaConfigured):
 class SourceFileInput(SchemaConfigured):
 
     createDirectFieldProperties(ISourceFileInput)
+
+    mimeType = mime_type = 'application/vnd.nextthought.rev.sourcefileinput'
 
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
@@ -111,6 +123,8 @@ class ExternalLinkInput(SchemaConfigured):
 
     createDirectFieldProperties(IExternalLinkInput)
 
+    mimeType = mime_type = 'application/vnd.nextthought.rev.externallinkinput'
+
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
 
@@ -119,6 +133,8 @@ class ExternalLinkInput(SchemaConfigured):
 class Speaker(SchemaConfigured):
 
     createDirectFieldProperties(ISpeaker)
+
+    mimeType = mime_type = 'application/vnd.nextthought.rev.speaker'
 
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
@@ -129,6 +145,8 @@ class Speakers(SchemaConfigured):
 
     createDirectFieldProperties(ISpeakers)
 
+    mimeType = mime_type = 'application/vnd.nextthought.rev.speakers'
+
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
 
@@ -137,6 +155,8 @@ class Speakers(SchemaConfigured):
 class MonologueElement(SchemaConfigured):
 
     createDirectFieldProperties(IMonologueElement)
+
+    mimeType = mime_type = 'application/vnd.nextthought.rev.monologueelement'
 
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
@@ -147,6 +167,8 @@ class MonologueElements(SchemaConfigured):
 
     createDirectFieldProperties(IMonologueElements)
 
+    mimeType = mime_type = 'application/vnd.nextthought.rev.monologueelements'
+
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
 
@@ -155,6 +177,8 @@ class MonologueElements(SchemaConfigured):
 class Monologue(SchemaConfigured):
 
     createDirectFieldProperties(IMonologue)
+
+    mimeType = mime_type = 'application/vnd.nextthought.rev.monologue'
 
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
@@ -165,6 +189,8 @@ class Monologues(SchemaConfigured):
 
     createDirectFieldProperties(IMonologues)
 
+    mimeType = mime_type = 'application/vnd.nextthought.rev.monologues'
+
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
 
@@ -173,6 +199,8 @@ class Monologues(SchemaConfigured):
 class Comment(SchemaConfigured):
 
     createDirectFieldProperties(IComment)
+
+    mimeType = mime_type = 'application/vnd.nextthought.rev.comment'
 
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
@@ -183,6 +211,8 @@ class Notification(SchemaConfigured):
 
     createDirectFieldProperties(INotification)
 
+    mimeType = mime_type = 'application/vnd.nextthought.rev.notification'
+
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
 
@@ -191,6 +221,8 @@ class Notification(SchemaConfigured):
 class Link(SchemaConfigured):
 
     createDirectFieldProperties(ILink)
+
+    mimeType = mime_type = 'application/vnd.nextthought.rev.link'
 
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
@@ -201,6 +233,8 @@ class Links(SchemaConfigured):
 
     createDirectFieldProperties(ILinks)
 
+    mimeType = mime_type = 'application/vnd.nextthought.rev.links'
+
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
 
@@ -209,6 +243,8 @@ class Links(SchemaConfigured):
 class Attachment(SchemaConfigured):
 
     createDirectFieldProperties(IAttachment)
+
+    mimeType = mime_type = 'application/vnd.nextthought.rev.attachment'
 
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
@@ -219,6 +255,8 @@ class Attachments(SchemaConfigured):
 
     createDirectFieldProperties(IAttachments)
 
+    mimeType = mime_type = 'application/vnd.nextthought.rev.attachments'
+
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
 
@@ -227,6 +265,8 @@ class Attachments(SchemaConfigured):
 class AttachmentContent(SchemaConfigured):
 
     createDirectFieldProperties(IAttachmentContent)
+
+    mimeType = mime_type = 'application/vnd.nextthought.rev.attachmentcontent'
 
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
@@ -237,6 +277,8 @@ class OrderRequest(SchemaConfigured):
 
     createDirectFieldProperties(IOrderRequest)
 
+    mimeType = mime_type = 'application/vnd.nextthought.rev.orderrequest'
+
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
 
@@ -245,6 +287,8 @@ class OrderRequest(SchemaConfigured):
 class OrderDetails(SchemaConfigured):
 
     createDirectFieldProperties(IOrderDetails)
+
+    mimeType = mime_type = 'application/vnd.nextthought.rev.orderdetails'
 
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
@@ -255,6 +299,8 @@ class Order(SchemaConfigured):
 
     createDirectFieldProperties(IOrder)
 
+    mimeType = mime_type = 'application/vnd.nextthought.rev.order'
+
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
 
@@ -263,6 +309,8 @@ class Order(SchemaConfigured):
 class Orders(SchemaConfigured):
 
     createDirectFieldProperties(IOrders)
+
+    mimeType = mime_type = 'application/vnd.nextthought.rev.orders'
 
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
@@ -273,6 +321,8 @@ class TranscriptionOptions(SchemaConfigured):
 
     createDirectFieldProperties(ITranscriptionOptions)
 
+    mimeType = mime_type = 'application/vnd.nextthought.rev.transcriptionoptions'
+
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
 
@@ -281,6 +331,8 @@ class TranscriptionOptions(SchemaConfigured):
 class TranscriptionOrderRequest(SchemaConfigured):
 
     createDirectFieldProperties(ITranscriptionOrderRequest)
+
+    mimeType = mime_type = 'application/vnd.nextthought.rev.transcriptionorderrequest'
 
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
@@ -291,6 +343,8 @@ class Caption(SchemaConfigured):
 
     createDirectFieldProperties(ICaption)
 
+    mimeType = mime_type = 'application/vnd.nextthought.rev.caption'
+
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
 
@@ -299,6 +353,8 @@ class Caption(SchemaConfigured):
 class CaptionOrderDetails(SchemaConfigured):
 
     createDirectFieldProperties(ICaptionOrderDetails)
+
+    mimeType = mime_type = 'application/vnd.nextthought.rev.captionorderdetails'
 
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
@@ -309,6 +365,8 @@ class CaptionOptions(SchemaConfigured):
 
     createDirectFieldProperties(ICaptionOptions)
 
+    mimeType = mime_type = 'application/vnd.nextthought.rev.captionoptions'
+
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
 
@@ -317,6 +375,8 @@ class CaptionOptions(SchemaConfigured):
 class CaptionOrderRequest(SchemaConfigured):
 
     createDirectFieldProperties(ICaptionOrderRequest)
+
+    mimeType = mime_type = 'application/vnd.nextthought.rev.captionorderrequest'
 
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
@@ -327,6 +387,8 @@ class CaptionOrder(SchemaConfigured):
 
     createDirectFieldProperties(ICaptionOrder)
 
+    mimeType = mime_type = 'application/vnd.nextthought.rev.captionorder'
+
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
 
@@ -335,6 +397,8 @@ class CaptionOrder(SchemaConfigured):
 class Transcription(SchemaConfigured):
 
     createDirectFieldProperties(ITranscription)
+
+    mimeType = mime_type = 'application/vnd.nextthought.rev.transcription'
 
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
@@ -345,6 +409,8 @@ class TranscriptionOrderDetails(SchemaConfigured):
 
     createDirectFieldProperties(ITranscriptionOrderDetails)
 
+    mimeType = mime_type = 'application/vnd.nextthought.rev.transcriptionorderdetails'
+
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
 
@@ -353,6 +419,8 @@ class TranscriptionOrderDetails(SchemaConfigured):
 class TranscriptionOrder(SchemaConfigured):
 
     createDirectFieldProperties(ITranscriptionOrder)
+
+    mimeType = mime_type = 'application/vnd.nextthought.rev.transcriptionorder'
 
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
