@@ -40,7 +40,8 @@ class TestExternalization(unittest.TestCase):
     def test_client_api_key(self):
         client_api_key = ClientAPIKey(client_api_key=u'qClt2chhujNEX6QXPHXmqzt9z3k')
         external = toExternalObject(client_api_key)
-        assert_that(external, has_entries({'client_api_key': 'qClt2chhujNEX6QXPHXmqzt9z3k'}))
+        assert_that(external, has_entries({'client_api_key': 'qClt2chhujNEX6QXPHXmqzt9z3k',
+                                           'MimeType': 'application/vnd.nextthought.rev.clientapikey'}))
 
         new_io = self._internalize(external)
         assert_that(new_io, has_properties({'client_api_key': 'qClt2chhujNEX6QXPHXmqzt9z3k'}))
@@ -48,21 +49,23 @@ class TestExternalization(unittest.TestCase):
     def test_user_api_key(self):
         user_api_key = UserAPIKey(user_api_key=u'AAAOiFQ21PgbaVUDAU1tYH2ZEV8=')
         external = toExternalObject(user_api_key)
-        assert_that(external, has_entries({'user_api_key': 'AAAOiFQ21PgbaVUDAU1tYH2ZEV8='}))
+        assert_that(external, has_entries({'user_api_key': 'AAAOiFQ21PgbaVUDAU1tYH2ZEV8=',
+                                           'MimeType': 'application/vnd.nextthought.rev.userapikey'}))
 
         new_io = self._internalize(external)
         assert_that(new_io, has_properties({'user_api_key': 'AAAOiFQ21PgbaVUDAU1tYH2ZEV8='}))
 
-#     def test_source_file_upload(self):
-#         source_file_upload = SourceFileUpload(content_type=u'video/mpeg',
-#                                               filename=u'video.mp4',
-#                                               url=u'http://www.server.com/file/987834')
-#         external = toExternalObject(source_file_upload)
-#         assert_that(external, has_entries({'content_type': 'video/mpeg',
-#                                            'filename': 'video.mp4',
-#                                            'url': 'http://www.server.com/file/987834'}))
-# 
-#         new_io = self._internalize(external)
-#         assert_that(new_io, has_properties({'content_type': 'video/mpeg',
-#                                            'filename': 'video.mp4',
-#                                            'url': 'http://www.server.com/file/987834'}))
+    def test_source_file_upload(self):
+        source_file_upload = SourceFileUpload(content_type=u'video/mpeg',
+                                              filename=u'video.mp4',
+                                              url=str('http://www.server.com/file/987834'))
+        external = toExternalObject(source_file_upload)
+        assert_that(external, has_entries({'content_type': 'video/mpeg',
+                                           'filename': 'video.mp4',
+                                           'url': 'http://www.server.com/file/987834',
+                                           'MimeType': 'application/vnd.nextthought.rev.sourcefileupload'}))
+ 
+        new_io = self._internalize(external)
+        assert_that(new_io, has_properties({'content_type': 'video/mpeg',
+                                           'filename': 'video.mp4',
+                                           'url': 'http://www.server.com/file/987834'}))
