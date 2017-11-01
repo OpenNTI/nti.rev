@@ -241,7 +241,7 @@ class IUserAPIKey(interface.Interface):
                             required=True)
 
 
-class IAuthorization(IClientAPIKey, IUserAPIKey):
+class ICredentials(IClientAPIKey, IUserAPIKey):
     """
     Security and authentication keys used to access the Rev API
     """
