@@ -33,13 +33,13 @@ class IRevClient(interface.Interface):
     BaseURL = HTTPURL(title="The BaseURL for this Rev endpoint",
                       required=True)
 
-    def __init__(credentials):
+    def __init__(BaseURL, credentials):
         """
         Args:
+            BaseURL (str): The Base URL for this Rev endpoint
             credentials (:obj:`ICredentials`): The client and user API keys.
         
         """
-
 
     def upload_source_file(source_file_upload):
         """
