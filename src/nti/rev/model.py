@@ -19,6 +19,7 @@ from nti.schema.schema import SchemaConfigured
 from nti.rev.interfaces import IClientAPIKey
 from nti.rev.interfaces import IUserAPIKey
 from nti.rev.interfaces import ICredentials
+from nti.rev.interfaces import IRevRoot
 from nti.rev.interfaces import ISourceFileUpload
 from nti.rev.interfaces import IInput
 from nti.rev.interfaces import ISourceFileInput
@@ -83,6 +84,11 @@ class Credentials(SchemaConfigured):
 
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
+
+@NoPickle
+@interface.implementer(IRevRoot)
+class RevRoot(SchemaConfigured):
+    createDirectFieldProperties(IRevRoot)
 
 @NoPickle
 @interface.implementer(ISourceFileUpload)
