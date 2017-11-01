@@ -18,7 +18,7 @@ from nti.schema.schema import SchemaConfigured
 
 from nti.rev.interfaces import IClientAPIKey
 from nti.rev.interfaces import IUserAPIKey
-from nti.rev.interfaces import IAuthorization
+from nti.rev.interfaces import ICredentials
 from nti.rev.interfaces import ISourceFileUpload
 from nti.rev.interfaces import IInput
 from nti.rev.interfaces import ISourceFileInput
@@ -74,12 +74,12 @@ class UserAPIKey(SchemaConfigured):
         SchemaConfigured.__init__(self, *args, **kwargs)
 
 @NoPickle
-@interface.implementer(IAuthorization)
-class Authorization(SchemaConfigured):
+@interface.implementer(ICredentials)
+class Credentials(SchemaConfigured):
 
-    createDirectFieldProperties(IAuthorization)
+    createDirectFieldProperties(ICredentials)
 
-    mimeType = mime_type = 'application/vnd.nextthought.rev.authorization'
+    mimeType = mime_type = 'application/vnd.nextthought.rev.credentials'
 
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
