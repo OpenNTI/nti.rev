@@ -9,6 +9,18 @@
     <include package="zope.component" />
 	<include package="zope.security" />
 	
+	<!-- Credentials -->
+	<include package="." file="meta.zcml" />			// what does this line do?
+	
+	<configure zcml:condition="have rev-sandbox">	// what condition to use?
+		<rev:registerCredentials
+			client_api_key="qClt2chhujNEX6QXPHXmqzt9z3k"	// does each key need to be registered separately?
+			user_api_key="AAAOiFQ21PgbaVUDAU1tYH2ZEV8= " />
+			
+		<rev:registerRevEndpoint
+			base="https://api-sandbox.rev.com/api/v1/" />
+	</configure>
+	
 	<!-- Externalization -->
 	<include package="nti.externalization" file="meta.zcml" />
 	<include package="nti.externalization" />
