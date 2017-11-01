@@ -247,6 +247,14 @@ class ICredentials(IClientAPIKey, IUserAPIKey):
     """
 
 
+class IRevRoot(interface.Interface):
+    """
+    The Rev endpoint root
+    """
+    BaseURL = HTTPURL(title="The BaseURL for this Rev endpoint",
+                      required=True)
+
+
 class ISourceFileUpload(interface.Interface):
     """
     Describes a media source file to be retrieved, uploaded, and used in an order.
