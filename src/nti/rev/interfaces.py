@@ -27,13 +27,16 @@ from nti.schema.field import ValidURI
 
 class IRevClient(interface.Interface):
     """
-    Handles Rev order operations.
+    Properties and functions for working with the Rev API
     """
+    
+    BaseURL = HTTPURL(title="The BaseURL for this Rev endpoint",
+                      required=True)
 
-    def __init__(authorization):
+    def __init__(credentials):
         """
         Args:
-            authorization (:obj:`IAuthorization`): The client and user API keys.
+            credentials (:obj:`ICredentials`): The client and user API keys.
         
         """
 
