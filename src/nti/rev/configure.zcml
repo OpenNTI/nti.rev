@@ -22,8 +22,8 @@
 			base="https://api-sandbox.rev.com/api/v1/" />
 	</configure>
 	
-	<!-- <utility factory=".rev.rev_client_factory"
-			 provides=".interfaces.IRevClient"/> -->
+	<utility factory=".rev.rev_client_factory"
+			 provides=".interfaces.IRevClient"/>
 
 	<!-- Externalization -->
 	<include package="nti.externalization" file="meta.zcml" />
