@@ -30,7 +30,7 @@ class IRevClient(interface.Interface):
     Properties and functions for working with the Rev API
     """
     
-    BaseURL = HTTPURL(title="The BaseURL for this Rev endpoint",
+    BaseURL = HTTPURL(title=u'The BaseURL for this Rev endpoint',
                       required=True)
 
     def __init__(BaseURL, credentials):
@@ -254,7 +254,7 @@ class IRevRoot(interface.Interface):
     """
     The Rev endpoint root
     """
-    BaseURL = HTTPURL(title="The BaseURL for this Rev endpoint",
+    BaseURL = HTTPURL(title=u'The BaseURL for this Rev endpoint',
                       required=True)
 
 
