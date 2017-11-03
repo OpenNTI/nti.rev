@@ -31,11 +31,9 @@ from nti.rev.model import OrderRequest
 from nti.rev.model import Link
 from nti.rev.model import Links
 
-from nti.rev.tests import SharedConfiguringTestLayer
+from nti.rev.tests import RevTestCase
 
-class TestExternalization(unittest.TestCase):
-
-    layer = SharedConfiguringTestLayer
+class TestExternalization(RevTestCase):
 
     def _internalize(self, external, context=None):
         factory = internalization.find_factory_for(external)
