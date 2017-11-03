@@ -8,6 +8,8 @@ from __future__ import absolute_import
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
 
+import unittest
+
 from zope.component.hooks import setHooks
 
 from nti.testing.layers import GCLayerMixin
@@ -15,7 +17,6 @@ from nti.testing.layers import ZopeComponentLayer
 from nti.testing.layers import ConfiguringLayerMixin
 
 import zope.testing.cleanup
-
 
 class SharedConfiguringTestLayer(ZopeComponentLayer,
                                  GCLayerMixin,
@@ -40,3 +41,6 @@ class SharedConfiguringTestLayer(ZopeComponentLayer,
     @classmethod
     def testTearDown(cls):
         pass
+
+class RevTestCase(unittest.TestCase):
+    layer = SharedConfiguringTestLayer
