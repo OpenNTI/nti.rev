@@ -13,8 +13,13 @@ import unittest
 
 from hamcrest import assert_that
 from hamcrest import is_
+from hamcrest import is_not
+
+from nti.rev import rev_client
 
 from nti.rev.rev import RevClient
+
+from nti.rev.tests import RevTestCase
 
 class TestRevClient(unittest.TestCase):
 
@@ -23,3 +28,17 @@ class TestRevClient(unittest.TestCase):
 
     def test_baseurl(self):
         assert_that(self.client.BaseURL, is_('https://api-sandbox.rev.com/api/v1/'))
+
+class TestCredentials(RevTestCase):
+    
+    def test_credentials(self):
+        # verify the client_api_key and user_api_key in the configure.zcml
+        # if it's 401, then they are invalid
+        client = rev_client()
+        url = client.BaseURL
+        # TODO: put credentials in header of HTTP request
+        
+        # TODO: make HTTP request
+        result = client.session(url)
+        # TODO: check status code to make sure not unauthorized
+        assert_that(result.status_code, is_not(401))
