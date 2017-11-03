@@ -2,6 +2,7 @@
 <configure  xmlns="http://namespaces.zope.org/zope"
             xmlns:i18n="http://namespaces.zope.org/i18n"
             xmlns:zcml="http://namespaces.zope.org/zcml"
+            xmlns:rev="http://nextthought.com/ntp/rev"
             xmlns:ext="http://nextthought.com/ntp/ext">
 
     <include package="zope.component" file="meta.zcml" />
@@ -12,17 +13,17 @@
 	<!-- Credentials -->
 	<include package="." file="meta.zcml" />
 
-	<configure zcml:condition="have rev-sandbox">	// what condition to use?
+	<configure zcml:condition="have rev-sandbox">
 		<rev:registerCredentials
-			client_api_key="qClt2chhujNEX6QXPHXmqzt9z3k"	// does each key need to be registered separately?
+			client_api_key="qClt2chhujNEX6QXPHXmqzt9z3k"
 			user_api_key="AAAOiFQ21PgbaVUDAU1tYH2ZEV8= " />
 
 		<rev:registerRevEndpoint
 			base="https://api-sandbox.rev.com/api/v1/" />
 	</configure>
 	
-	<utility factory=".rev.rev_client_factory"
-			 provides=".interfaces.IRevClient"/>
+	<!-- <utility factory=".rev.rev_client_factory"
+			 provides=".interfaces.IRevClient"/> -->
 
 	<!-- Externalization -->
 	<include package="nti.externalization" file="meta.zcml" />
@@ -30,7 +31,7 @@
 	<ext:registerAutoPackageIO
 		root_interfaces=".interfaces.IClientAPIKey
 						 .interfaces.IUserAPIKey
-						 .interfaces.IAuthorization
+						 .interfaces.ICredentials
 						 .interfaces.ISourceFileUpload
 						 .interfaces.IInput
 						 .interfaces.ISourceFileInput
