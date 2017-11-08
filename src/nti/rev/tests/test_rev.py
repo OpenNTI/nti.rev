@@ -19,7 +19,7 @@ from nti.rev import rev_client
 
 from nti.rev.rev import RevClient
 
-from nti.rev.tests import RevTestCase
+from nti.rev.tests import SharedConfiguringTestLayer
 
 class TestRevClient(unittest.TestCase):
 
@@ -29,7 +29,9 @@ class TestRevClient(unittest.TestCase):
     def test_baseurl(self):
         assert_that(self.client.BaseURL, is_('https://api-sandbox.rev.com/api/v1/'))
 
-class TestCredentials(RevTestCase):
+class TestCredentials(unittest.TestCase):
+    
+    layer = SharedConfiguringTestLayer
     
     def test_credentials(self):
         # verify the client_api_key and user_api_key in the configure.zcml
@@ -39,6 +41,6 @@ class TestCredentials(RevTestCase):
         # TODO: put credentials in header of HTTP request
         
         # TODO: make HTTP request
-        result = client.session(url)
+        result = client.session.get(url)
         # TODO: check status code to make sure not unauthorized
         assert_that(result.status_code, is_not(401))
