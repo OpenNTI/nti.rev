@@ -13,7 +13,7 @@
 	<!-- Credentials -->
 	<include package="." file="meta.zcml" />
 
-	<configure zcml:condition="have rev-sandbox">
+	<configure>
 		<rev:registerCredentials
 			client_api_key="qClt2chhujNEX6QXPHXmqzt9z3k"
 			user_api_key="AAAOiFQ21PgbaVUDAU1tYH2ZEV8= " />
