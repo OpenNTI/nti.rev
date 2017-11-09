@@ -37,8 +37,7 @@ class TestCredentials(unittest.TestCase):
         # verify the client_api_key and user_api_key in the configure.zcml
         # if it's 401, then they are invalid
         client = rev_client()
-        url = client.BaseURL
-        # TODO: put credentials in header of HTTP request
+        url = client.OrdersURL
         
         # TODO: make HTTP request
         result = client.session.get(url)
