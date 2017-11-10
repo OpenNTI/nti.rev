@@ -15,9 +15,9 @@ from hamcrest import assert_that
 from hamcrest import is_
 from hamcrest import is_not
 
-from nti.rev import rev_client
-
 from nti.rev.rev import RevClient
+
+from nti.rev import rev_client
 
 from nti.rev.tests import SharedConfiguringTestLayer
 
@@ -28,6 +28,18 @@ class TestRevClient(unittest.TestCase):
 
     def test_baseurl(self):
         assert_that(self.client.BaseURL, is_('https://api-sandbox.rev.com/api/v1/'))
+    
+    def test_operation_construction(self):
+        url = self.client.url_for_operation('orders', params={'orderNumber': 'TC432432'})
+        assert_that(url, is_('https://api-sandbox.rev.com/api/v1/orders?orderNumber=TC432432'))
+    
+    # _entry_information_url > test_entry_information | _orders_url > test_orders
+    #def test_orders(self):
+        # TODO
+    
+    # TODO: fetch_entry_information > nowhere? | get_orders > somewhere
+    # test default values
+    # test errors/exceptions, like providing both orderNumber and referenceId
 
 class TestCredentials(unittest.TestCase):
     
@@ -37,7 +49,7 @@ class TestCredentials(unittest.TestCase):
         # verify the client_api_key and user_api_key in the configure.zcml
         # if it's 401, then they are invalid
         client = rev_client()
-        url = client.OrdersURL
+        url = client.BaseURL    # FIXME: use URL that requires authorization
         
         # TODO: make HTTP request
         result = client.session.get(url)
