@@ -36,10 +36,20 @@ class TestRevClient(unittest.TestCase):
     def test_orders(self):
         url = self.client._orders_url({'orderNumber': 'TC432432'})
         assert_that(url, is_('https://api-sandbox.rev.com/api/v1/orders?orderNumber=TC432432'))
-    
-    # TODO: fetch_entry_information > nowhere? | get_orders > somewhere
-    # test default values
-    # test errors/exceptions, like providing both orderNumber and referenceId
+
+    def test_get_orders(self):
+        result = self.client.get_orders()
+        # test default values
+        
+        # test orders retrieved meet specified parameters
+        
+        # test only orders matching specified orderNumber are retrieved
+        
+        # test only orders matching specified referenceId are retrieved
+        
+        # test exception raised when both orderNumber and referenceId are specified
+        
+        # what is the functionality if no orders are found matching specified orderNumber or referenceId?
 
 class TestCredentials(unittest.TestCase):
     
@@ -51,7 +61,7 @@ class TestCredentials(unittest.TestCase):
         client = rev_client()
         url = client.BaseURL    # FIXME: use URL that requires authorization
         
-        # TODO: make HTTP request
+        # make HTTP request
         result = client.session.get(url)
-        # TODO: check status code to make sure not unauthorized
+        # check status code to make sure not unauthorized
         assert_that(result.status_code, is_not(401))
