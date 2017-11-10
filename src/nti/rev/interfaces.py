@@ -24,6 +24,26 @@ from nti.schema.field import DateTime
 from nti.schema.field import TextLine
 from nti.schema.field import ValidURI
 
+class RevException(Exception):
+    pass
+
+class RevUnreachableException(RevException):
+    """
+    Raised when the Rev system cannot be reached
+    """
+
+class RevAPIException(RevException):
+    """
+    Raised when an error occurs communicating with the Rev API
+    """
+    error_code = None   # Numeric error code specified by Rev
+    status_code = None
+
+    def __init__(self, message, error_code=None, status_code=None):
+        super(RevAPIException, self).__init__(message)
+        
+        self.error_code = error_code
+        self.status_code = status_code
 
 class IRevClient(interface.Interface):
     """
