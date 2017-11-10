@@ -120,6 +120,8 @@ class RevClient(SchemaConfigured):
         result = _transform_json_results(response)
         logger.debug('Received response from Rev %s', result)
 
+        # FIXME: return Orders object providing IOrders interface
+        # FIXME: raise exception if doesn't match IOrders interface?
         return result[0]
 
 #     def upload_source_file(self, source_file_upload):
