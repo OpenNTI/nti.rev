@@ -10,6 +10,9 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 import urlparse
+from urllib import urlencode
+
+from requests.exceptions import ConnectionError
 
 from zope import component
 from zope import interface
@@ -22,7 +25,42 @@ from nti.rev.interfaces import ICredentials
 from nti.rev.interfaces import IRevClient
 from nti.rev.interfaces import IRevRoot
 
+from nti.rev.interfaces import RevAPIException
+from nti.rev.interfaces import RevUnreachableException
+
 from nti.rev.utils import make_session
+
+def _transform_json_results(response, expected_response=200):
+    """
+    Inspects the response and returns the json body of the response if
+    the response was successful. Raises an exception if the response was
+    unsuccessful.
+    """
+    
+    # if response did not execute successfully
+    if expected_response is not None and expected_response != response.status_code:
+        # try to get error code and message from response body
+        error_code = None
+        message = None
+        try:
+            body = response.json()[0]
+            error_code = body.get(u'code')
+            message = body.get(u'message')
+        except:
+            logger.exception('Unable to get description of error from body.')
+            pass
+        if not message:
+            message = 'An unknown error occurred.'
+
+        raise RevAPIException(message, error_code=error_code, status_code=response.status_code)
+
+    try:
+        body = response.json()
+    except ValueError:
+        logger.exception('No JSON object could be decoded')
+        raise RevAPIException('No JSON object could be decoded')
+    
+    return body
 
 @interface.implementer(IRevClient)
 class RevClient(SchemaConfigured):
@@ -67,14 +105,22 @@ class RevClient(SchemaConfigured):
                                        'pageSize': pageSize,
                                        'orderNumber': orderNumber,
                                        'referenceId': referenceId})
-        
-        # logger.info('Getting orders for FIXME')
+
+        logger.info('Getting page number %s of size %s for orders with order number %s or reference ID %s', pagenum, pageSize, orderNumber, referenceId)
         logger.debug('Using Rev API %s', url)
-        
-        # try:
-        #    response = self.session.get(url)
-            
-        # TODO: finish method
+
+        try:
+            response = self.session.get(url)
+        except ConnectionError:
+            logger.exception('Connection error communicating with %s', url)
+            raise RevUnreachableException('Unable to connect to Rev system.')
+
+        logger.info('Completed request for page number %s of size %s for orders with order number %s or reference ID %s', pagenum, pageSize, orderNumber, referenceId)
+
+        result = _transform_json_results(response)
+        logger.debug('Received response from Rev %s', result)
+
+        return result[0]
 
 #     def upload_source_file(self, source_file_upload):
         
