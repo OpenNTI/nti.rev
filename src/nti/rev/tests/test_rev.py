@@ -33,9 +33,9 @@ class TestRevClient(unittest.TestCase):
         url = self.client.url_for_operation('orders', params={'orderNumber': 'TC432432'})
         assert_that(url, is_('https://api-sandbox.rev.com/api/v1/orders?orderNumber=TC432432'))
     
-    # _entry_information_url > test_entry_information | _orders_url > test_orders
-    #def test_orders(self):
-        # TODO
+    def test_orders(self):
+        url = self.client._orders_url({'orderNumber': 'TC432432'})
+        assert_that(url, is_('https://api-sandbox.rev.com/api/v1/orders?orderNumber=TC432432'))
     
     # TODO: fetch_entry_information > nowhere? | get_orders > somewhere
     # test default values
