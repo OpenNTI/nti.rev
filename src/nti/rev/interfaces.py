@@ -362,8 +362,7 @@ MONOLOGUE_ELEMENT_TYPE_ITEMS = (MONOLOGUE_ELEMENT_TYPE_TEXT,
                                 MONOLOGUE_ELEMENT_TYPE_TAG)
 
 MONOLOGUE_ELEMENT_TYPE_VOCABULARY = SimpleVocabulary(
-    [SimpleTerm(_x) for _x in MONOLOGUE_ELEMENT_TYPE_ITEMS]
-)
+    [SimpleTerm(_x) for _x in MONOLOGUE_ELEMENT_TYPE_ITEMS])
 
 
 class IMonologueElement(interface.Interface):
@@ -457,8 +456,7 @@ NOTIFICATION_ITEMS = (NOTIFICATION_DETAILED,
                       NOTIFICATION_FINAL_ONLY)
 
 NOTIFICATION_VOCABULARY = SimpleVocabulary(
-    [SimpleTerm(_x) for _x in NOTIFICATION_ITEMS]
-)
+    [SimpleTerm(_x) for _x in NOTIFICATION_ITEMS])
 
 
 class INotification(interface.Interface):
@@ -507,8 +505,7 @@ ATTACHMENT_KIND_ITEMS = (ATTACHMENT_KIND_MEDIA,
                          ATTACHMENT_KIND_CAPTION)
 
 ATTACHMENT_KIND_VOCABULARY = SimpleVocabulary(
-    [SimpleTerm(_x) for _x in ATTACHMENT_KIND_ITEMS]
-)
+    [SimpleTerm(_x) for _x in ATTACHMENT_KIND_ITEMS])
 
 
 class IAttachment(interface.Interface):
@@ -576,9 +573,36 @@ class IOrderRequest(interface.Interface):
                           required=False)
 
 
-#: Completed and Cancelled are the only status values guaranteed not to
-#: change in v1 of the API.
+class ICaption(interface.Interface):
+    """
+    Caption details for a caption order
+    including total length of the audio of media attachments for the order
+    """
 
+    total_length_seconds = Number(title=u'The total length (in seconds) of the videos included in the caption order',
+                                  required=True)
+
+
+class ITranscription(interface.Interface):
+    """
+    Transcription details for a transcription order
+    including total length of the audio of media attachments for the order
+    and additional services
+    """
+
+    total_length_seconds = Number(title=u'Total length of the audio (in seconds) of media attachments for an order',
+                                  required=True)
+
+    verbatim = Bool(title=u'The transcription is verbatim',
+                    description=u"""If true, all filler words (i.e. umm, huh) are included in the transcription""",
+                    required=True)
+
+    timestamps = Bool(title=u'Timestamps are included in the transcription',
+                      required=True)
+
+
+# Completed and Cancelled are the only status values guaranteed not to
+# change in v1 of the API.
 
 ORDER_STATUS_COMPLETED = u'Completed'
 ORDER_STATUS_CANCELLED = u'Cancelled'
@@ -593,8 +617,17 @@ ORDER_STATUS_ITEMS = (ORDER_STATUS_TRANSCRIBING,
                       ORDER_STATUS_CANCELLED)
 
 ORDER_STATUS_VOCABULARY = SimpleVocabulary(
-    [SimpleTerm(_x) for _x in ORDER_STATUS_ITEMS]
-)
+    [SimpleTerm(_x) for _x in ORDER_STATUS_ITEMS])
+
+
+# TODO: Determine additional possible priorities
+
+ORDER_PRIORITY_NORMAL = u'Normal'
+
+ORDER_PRIORITY_ITEMS = (ORDER_PRIORITY_NORMAL)
+
+ORDER_PRIORITY_VOCABULARY = SimpleVocabulary(
+    [SimpleTerm(_x) for _x in ORDER_PRIORITY_ITEMS])
 
 
 class IOrderDetails(interface.Interface):
@@ -605,6 +638,7 @@ class IOrderDetails(interface.Interface):
     order_number = TextLine(title=u'Rev assigned order number',
                             required=True)
 
+    # FIXME: client_ref included in both IOrderRequest and IOrderDetails
     client_ref = TextLine(title=u'The client reference order number provided with the order request',
                           required=True)
 
@@ -618,6 +652,28 @@ class IOrderDetails(interface.Interface):
                     title=u'The status of the order',
                     required=True)
 
+    priority = Choice(vocabulary=ORDER_PRIORITY_VOCABULARY,
+                      title=u'The priority of the order',
+                      required=True)
+    
+    non_standard_tat_guarantee = Bool(title=u'Normal turnaround time is not needed',
+                                      description=u"""By default, normal turnaround time (false) is assumed.
+                                      Note that this value is used as a guideline only.""",
+                                      required=False)
+    
+    # FIXME: Required for ICaptionOrderDetails
+    caption = Object(schema=ICaption,
+                     title=u'Caption details for the caption order',
+                     description=u"""Total length (in seconds) of the videos included in the caption order""",
+                     required=False)
+    
+    # FIXME: Required for ITranscriptionOrderDetails
+    transcription = Object(schema=ITranscription,
+                           title=u'Transcription details for the transcription order',
+                           description=u"""Total length of the audio (in seconds) of media attachments for the order 
+                           and additional services""",
+                           required=False)
+    
     attachments = List(value_type=Object(IAttachment),
                        title=u'The attachments with the order',
                        required=True)
@@ -637,6 +693,16 @@ class IOrders(interface.Interface):
     """
     A list of orders
     """
+
+    total_count = Number(title=u'The total number of orders',
+                         required=True)
+
+    results_per_page = Number(title=u'The number of results returned in each page',
+                              required=True)
+
+    page = Number(title=u'The number of the page returned',
+                  description=u'Page numbering is 0-based',
+                  required=True)
 
     orders = List(value_type=Object(IOrder),
                   title=u'A list of orders',
@@ -675,16 +741,6 @@ class ITranscriptionOrderRequest(IOrderRequest):
                                    description=u"""Provides information on what needs to be transcribed 
                                    and allows for any transcription options to be set""",
                                    required=True)
-
-
-class ICaption(interface.Interface):
-    """
-    Caption details for a caption order
-    including total length of the audio of media attachments for the order
-    """
-
-    total_length_seconds = Number(title=u'The total length (in seconds) of the videos included in the caption order',
-                                  required=True)
 
 
 class ICaptionOrderDetails(IOrderDetails):
@@ -803,25 +859,6 @@ class ICaptionOrder(ICaptionOrderRequest, ICaptionOrderDetails, IOrder):
     """
     A caption order
     """
-
-
-class ITranscription(interface.Interface):
-    """
-    Transcription details for a transcription order
-    including total length of the audio of media attachments for the order
-    and additional services
-    """
-
-    total_length_seconds = Number(title=u'Total length of the audio (in seconds) of media attachments for an order',
-                                  required=True)
-
-    verbatim = Bool(title=u'The transcription is verbatim',
-                    description=u"""If true, all filler words (i.e. umm, huh) are included in the transcription""",
-                    required=True)
-
-    timestamps = Bool(title=u'Timestamps are included in the transcription',
-                      required=True)
-
 
 class ITranscriptionOrderDetails(IOrderDetails):
     """
