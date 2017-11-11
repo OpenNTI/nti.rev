@@ -28,6 +28,8 @@ from nti.rev.interfaces import IRevRoot
 from nti.rev.interfaces import RevAPIException
 from nti.rev.interfaces import RevUnreachableException
 
+from nti.rev.model import Orders
+
 from nti.rev.utils import make_session
 
 def _transform_json_results(response, expected_response=200):
@@ -120,9 +122,8 @@ class RevClient(SchemaConfigured):
         result = _transform_json_results(response)
         logger.debug('Received response from Rev %s', result)
 
-        # FIXME: return Orders object providing IOrders interface
-        # FIXME: raise exception if doesn't match IOrders interface?
-        return result[0]
+        # Create and return Orders object providing IOrders interface from the response JSON
+        return Orders(**result)
 
 #     def upload_source_file(self, source_file_upload):
         
