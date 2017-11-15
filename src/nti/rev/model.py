@@ -307,8 +307,16 @@ class Order(SchemaConfigured):
 
     mimeType = mime_type = 'application/vnd.nextthought.rev.order'
 
-    def __init__(self, *args, **kwargs):
-        SchemaConfigured.__init__(self, *args, **kwargs)
+    def __setattr__(self, name, value):
+        # This can be done more elegantly with a custom field
+        # and FieldPropertyStoredThroughField
+        if name == "caption":
+            try:
+                caption = Caption(**value)
+                value = caption
+            except (TypeError, StandardError):
+                pass
+        return SchemaConfigured.__setattr__(self, name, value)
 
 @NoPickle
 @interface.implementer(IOrders)
@@ -317,9 +325,18 @@ class Orders(SchemaConfigured):
     createDirectFieldProperties(IOrders)
 
     mimeType = mime_type = 'application/vnd.nextthought.rev.orders'
-
-    def __init__(self, *args, **kwargs):
-        SchemaConfigured.__init__(self, *args, **kwargs)
+    
+    def __setattr__(self, name, value):
+        # This can be done more elegantly with a custom field
+        # and FieldPropertyStoredThroughField
+        if name == "orders":
+            try:
+                for x in range(len(value)):
+                    order = Order(**value[x])
+                    value[x] = order
+            except (TypeError, StandardError):
+                pass
+        return SchemaConfigured.__setattr__(self, name, value)
 
 @NoPickle
 @interface.implementer(ITranscriptionOptions)
