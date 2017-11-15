@@ -579,6 +579,9 @@ class ICaption(interface.Interface):
     including total length of the audio of media attachments for the order
     """
 
+    total_length = Number(title=u'The total length',
+                          required = True)
+
     total_length_seconds = Number(title=u'The total length (in seconds) of the videos included in the caption order',
                                   required=True)
 
@@ -604,7 +607,7 @@ class ITranscription(interface.Interface):
 # Completed and Cancelled are the only status values guaranteed not to
 # change in v1 of the API.
 
-ORDER_STATUS_COMPLETED = u'Completed'
+ORDER_STATUS_COMPLETE = u'Complete'
 ORDER_STATUS_CANCELLED = u'Cancelled'
 ORDER_STATUS_CAPTIONING = u'Captioning'
 ORDER_STATUS_IN_PROGRESS = u'In Progress'
@@ -613,7 +616,7 @@ ORDER_STATUS_TRANSCRIBING = u'Transcribing'
 ORDER_STATUS_ITEMS = (ORDER_STATUS_TRANSCRIBING,
                       ORDER_STATUS_CAPTIONING,
                       ORDER_STATUS_IN_PROGRESS,
-                      ORDER_STATUS_COMPLETED,
+                      ORDER_STATUS_COMPLETE,
                       ORDER_STATUS_CANCELLED)
 
 ORDER_STATUS_VOCABULARY = SimpleVocabulary(
@@ -623,8 +626,10 @@ ORDER_STATUS_VOCABULARY = SimpleVocabulary(
 # TODO: Determine additional possible priorities
 
 ORDER_PRIORITY_NORMAL = u'Normal'
+ORDER_PRIORITY_TIMEINSENSITIVE = u'TimeInsensitive'
 
-ORDER_PRIORITY_ITEMS = (ORDER_PRIORITY_NORMAL)
+ORDER_PRIORITY_ITEMS = (ORDER_PRIORITY_NORMAL,
+                        ORDER_PRIORITY_TIMEINSENSITIVE)
 
 ORDER_PRIORITY_VOCABULARY = SimpleVocabulary(
     [SimpleTerm(_x) for _x in ORDER_PRIORITY_ITEMS])
@@ -655,7 +660,7 @@ class IOrderDetails(interface.Interface):
     priority = Choice(vocabulary=ORDER_PRIORITY_VOCABULARY,
                       title=u'The priority of the order',
                       required=True)
-    
+
     non_standard_tat_guarantee = Bool(title=u'Normal turnaround time is not needed',
                                       description=u"""By default, normal turnaround time (false) is assumed.
                                       Note that this value is used as a guideline only.""",
