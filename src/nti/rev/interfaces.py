@@ -154,19 +154,20 @@ class IRevClient(interface.Interface):
             
         """
 
-    def get_orders(pagenum=1, pageSize=25, orderNumber=None, referenceId=None):
+    def get_orders(page=0, results_per_page=25, order_number=None, client_ref=None):
         """
         Get the paged list IOrders for user, optionally getting orders with specific order number or reference ID.
         
         Args:
-            pagenum (int, optional): The number of the page of orders to return. Defaults to page 1.
-            pageSize (int, optional): The number of orders per page to return. Page size must be between 5 and 100.
+            page (int, optional): The number of the page of orders to return. Defaults to page 0.
+            results_per_page (int, optional): The number of orders per page to return.
                 Defaults to 25 orders per page.
-            orderNumber (str, optional): The order number of the order to retrieve. 
-                Must not be specified if clientRef is specified. 
+                Page size must be between 5 and 100, else defaults to 25 orders per page.
+            order_number (str, optional): The order number of the order to retrieve. 
+                Must not be specified if client_ref is specified. 
                 Defaults to returning all orders.
-            referenceId (str, optional): The reference ID as used in your application of the order to retrieve.
-                Must not be specified if orderNumber is specified.
+            client_ref (str, optional): The reference ID as used in your application of the order to retrieve.
+                Must not be specified if order_number is specified.
                 Defaults to returning all orders.
         
         Returns:
@@ -179,7 +180,7 @@ class IRevClient(interface.Interface):
                 To get those, call get_order(ordernum) with the appropriate order number.
                 
         Raises:
-            OrderNumberAndReferenceIdSpecified: If both orderNumber and referenceId are specified.
+            RevAPIException: If both order_number and client_ref are specified.
         
         """
 
