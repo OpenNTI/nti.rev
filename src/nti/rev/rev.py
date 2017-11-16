@@ -89,6 +89,12 @@ class RevClient(SchemaConfigured):
         
         # create dictionary by parsing query string (components[4]) into name, value pairs
         query = dict(urlparse.parse_qsl(components[4]))
+
+        # if a parameter value is None, remove the parameter entry from the params dictionary
+        for key in params.keys():
+            if params.get(key) is None:
+                del params[key]
+
         # add the params dictionary into the query dictionary
         query.update(params)
         
@@ -102,13 +108,13 @@ class RevClient(SchemaConfigured):
     def _orders_url(self, params):
         return self.url_for_operation('orders', params=params)
 
-    def get_orders(self, pagenum=1, pageSize=25, orderNumber=None, referenceId=None):
-        url = self._orders_url(params={'pagenum': pagenum,
-                                       'pageSize': pageSize,
-                                       'orderNumber': orderNumber,
-                                       'referenceId': referenceId})
+    def get_orders(self, page=0, results_per_page=25, order_number=None, client_ref=None):
+        url = self._orders_url(params={'page': page,
+                                       'pageSize': results_per_page,
+                                       'ids': order_number,
+                                       'clientRef': client_ref})
 
-        logger.info('Getting page number %s of size %s for orders with order number %s or reference ID %s', pagenum, pageSize, orderNumber, referenceId)
+        logger.info('Getting page number %s of size %s for orders with order number %s or reference ID %s', page, results_per_page, order_number, client_ref)
         logger.debug('Using Rev API %s', url)
 
         try:
@@ -117,7 +123,7 @@ class RevClient(SchemaConfigured):
             logger.exception('Connection error communicating with %s', url)
             raise RevUnreachableException('Unable to connect to Rev system.')
 
-        logger.info('Completed request for page number %s of size %s for orders with order number %s or reference ID %s', pagenum, pageSize, orderNumber, referenceId)
+        logger.info('Completed request for page number %s of size %s for orders with order number %s or reference ID %s', page, results_per_page, order_number, client_ref)
 
         result = _transform_json_results(response)
         logger.debug('Received response from Rev %s', result)
