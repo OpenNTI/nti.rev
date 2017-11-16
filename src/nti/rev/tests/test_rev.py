@@ -12,14 +12,18 @@ logger = __import__('logging').getLogger(__name__)
 import unittest
 
 from hamcrest import assert_that
+from hamcrest import calling
 from hamcrest import is_
 from hamcrest import is_not
+from hamcrest import raises
+
+from nti.rev import rev_client
+
+from nti.rev.interfaces import RevAPIException
 
 from nti.rev.model import Credentials
 
 from nti.rev.rev import RevClient
-
-from nti.rev import rev_client
 
 from nti.rev.tests import SharedConfiguringTestLayer
 
@@ -40,18 +44,45 @@ class TestRevClient(unittest.TestCase):
         assert_that(url, is_('https://api-sandbox.rev.com/api/v1/orders?orderNumber=TC432432'))
 
     def test_get_orders(self):
-        result = self.client.get_orders()
-        # test default values
+        # test default values if no arguments specified
+        orders = self.client.get_orders()
+        assert_that(orders.page, is_(0))
+        assert_that(orders.results_per_page, is_(25))
         
-        # test orders retrieved meet specified parameters
+        # test arguments specified
+        orders = self.client.get_orders(page=2, results_per_page=10)
+        assert_that(orders.page, is_(2))
+        assert_that(orders.results_per_page, is_(10))
         
-        # test only orders matching specified orderNumber are retrieved
+        # test results_per_page set to default if argument specified is out of bounds
+        orders = self.client.get_orders(results_per_page=4)
+        assert_that(orders.results_per_page, is_(25))
+
+        orders = self.client.get_orders(results_per_page=101)
+        assert_that(orders.results_per_page, is_(25))
+
+        # test only orders matching specified order_number are retrieved
+        orders = self.client.get_orders(order_number='CP0927624606')
+        for order in orders.orders:
+            assert_that(order.order_number, is_('CP0927624606'))
         
-        # test only orders matching specified referenceId are retrieved
+        # test only orders matching specified client_ref are retrieved
+        orders = self.client.get_orders(client_ref='myref1')
+        for order in orders.orders:
+            assert_that(order.client_ref, is_('myref1'))
         
-        # test exception raised when both orderNumber and referenceId are specified
+        # test exception raised when both order_number and client_ref are specified
+        assert_that(calling(self.client.get_orders).with_args(order_number='CP0927624606', client_ref="myref1"),
+                    raises(RevAPIException))
+
+        # test no orders found matching specified order_number or client_ref
+        orders = self.client.get_orders(order_number=0)
+        assert_that(orders.total_count, is_(0))
+        assert_that(orders.orders, is_([]))
         
-        # what is the functionality if no orders are found matching specified orderNumber or referenceId?
+        orders = self.client.get_orders(client_ref='None')
+        assert_that(orders.total_count, is_(0))
+        assert_that(orders.orders, is_([]))
 
 class TestCredentials(unittest.TestCase):
     
