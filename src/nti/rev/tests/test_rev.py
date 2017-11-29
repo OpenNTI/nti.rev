@@ -38,10 +38,18 @@ class TestRevClient(unittest.TestCase):
     def test_operation_construction(self):
         url = self.client.url_for_operation('orders', params={'orderNumber': 'TC432432'})
         assert_that(url, is_('https://api-sandbox.rev.com/api/v1/orders?orderNumber=TC432432'))
-    
+
+    def test_order(self):
+        url = self.client._order_url('TC432432')
+        assert_that(url, is_('https://api-sandbox.rev.com/api/v1/orders/TC432432'))
+
     def test_orders(self):
         url = self.client._orders_url({'orderNumber': 'TC432432'})
         assert_that(url, is_('https://api-sandbox.rev.com/api/v1/orders?orderNumber=TC432432'))
+
+    def test_get_order(self):
+        order = self.client.get_order('CP0927624606')
+        assert_that(order.order_number, is_('CP0927624606'))
 
     def test_get_orders(self):
         # test default values if no arguments specified
