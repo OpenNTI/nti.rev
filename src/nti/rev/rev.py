@@ -28,6 +28,7 @@ from nti.rev.interfaces import IRevRoot
 from nti.rev.interfaces import RevAPIException
 from nti.rev.interfaces import RevUnreachableException
 
+from nti.rev.model import Order
 from nti.rev.model import Orders
 
 from nti.rev.utils import make_session
@@ -74,7 +75,7 @@ class RevClient(SchemaConfigured):
     def __init__(self, BaseURL=None, credentials=None):
         self.BaseURL = BaseURL
         self.session = make_session(self.BaseURL, credentials=credentials)
-    
+
     def url_for_operation(self, entity_type, params={}):
         """
         Constructs a URL for the desired entity and params
@@ -83,10 +84,10 @@ class RevClient(SchemaConfigured):
         base = self.BaseURL 
         # append the operation-specific component to the base URL
         joined = urlparse.urljoin(base, entity_type)
-        
+
         # parse URL into 6 components: scheme, netloc, path, params, query, fragment
         components = list(urlparse.urlparse(joined))
-        
+
         # create dictionary by parsing query string (components[4]) into name, value pairs
         query = dict(urlparse.parse_qsl(components[4]))
 
@@ -97,16 +98,39 @@ class RevClient(SchemaConfigured):
 
         # add the params dictionary into the query dictionary
         query.update(params)
-        
+
         # convert query dictionary to percent-encoded string of
         # key=value pairs separated by '&' characters
         components[4] = urlencode(query)
-        
+
         # concatenate URL components back into URL
         return urlparse.urlunparse(components)
-    
+
+    def _order_url(self, order_number):
+        return (self.url_for_operation('orders') + '/' + order_number)
+
     def _orders_url(self, params):
         return self.url_for_operation('orders', params=params)
+
+    def get_order(self, order_number):
+        url = self._order_url(order_number)
+
+        logger.info('Getting order with order number %s', order_number)
+        logger.debug('Using Rev API %s', url)
+
+        try:
+            response = self.session.get(url)
+        except ConnectionError:
+            logger.exception('Connection error communicating with %s', url)
+            raise RevUnreachableException('Unable to connect to Rev system.')
+
+        logger.info('Completed request for order with order number %s', order_number)
+
+        result = _transform_json_results(response)
+        logger.debug('Received response from Rev %s', result)
+
+        # Create and return Order object providing IOrder interface from the response JSON
+        return Order(**result)
 
     def get_orders(self, page=0, results_per_page=25, order_number=None, client_ref=None):
         url = self._orders_url(params={'page': page,
