@@ -28,6 +28,7 @@ from nti.rev.interfaces import IRevRoot
 from nti.rev.interfaces import RevAPIException
 from nti.rev.interfaces import RevUnreachableException
 
+from nti.rev.model import Attachment
 from nti.rev.model import Order
 from nti.rev.model import Orders
 
@@ -111,6 +112,9 @@ class RevClient(SchemaConfigured):
 
     def _orders_url(self, params):
         return self.url_for_operation('orders', params=params)
+    
+    def _attachment_url(self, attachment_id):
+        return (self.url_for_operation('attachments') + '/' + attachment_id)
 
     def get_order(self, order_number):
         url = self._order_url(order_number)
@@ -155,15 +159,31 @@ class RevClient(SchemaConfigured):
         # Create and return Orders object providing IOrders interface from the response JSON
         return Orders(**result)
 
+    def get_attachment(self, attachment_id):
+        url = self._attachment_url(attachment_id)
+
+        logger.info('Getting attachment with attachment id %s', attachment_id)
+        logger.debug('Using Rev API %s', url)
+
+        try:
+            response = self.session.get(url)
+        except ConnectionError:
+            logger.exception('Connection error communicating with %s', url)
+            raise RevUnreachableException('Unable to connect to Rev system.')
+
+        logger.info('Completed request for attachment with attachment id %s', attachment_id)
+
+        result = _transform_json_results(response)
+        logger.debug('Received response from Rev %s', result)
+
+        # Create and return Attachment object providing IAttachment interface from the response JSON
+        return Attachment(**result)
+
 #     def upload_source_file(self, source_file_upload):
         
 #     def submit_transcription_order(self, transcription_order_request):
     
 #     def submit_caption_order(self, caption_order_request):
-
-#     def get_order(self, ordernum):
-
-#     def get_orders(self, pagenum=1, pageSize=25, orderNumber=None, referenceId=None):
 
 #     def cancel_order(self, ordernum):
 

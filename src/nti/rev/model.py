@@ -240,9 +240,17 @@ class Links(SchemaConfigured):
     createDirectFieldProperties(ILinks)
 
     mimeType = mime_type = 'application/vnd.nextthought.rev.links'
-
-    def __init__(self, *args, **kwargs):
-        SchemaConfigured.__init__(self, *args, **kwargs)
+    
+    def __setattr__(self, name, value):
+        # This can be done more elegantly with a custom field
+        # and FieldPropertyStoredThroughField
+        try:
+            for x in range(len(value)):
+                link = Link(**value[x])
+                value[x] = link
+        except (TypeError, StandardError):
+            pass
+        return SchemaConfigured.__setattr__(self, name, value)
 
 @NoPickle
 @interface.implementer(IAttachment)
@@ -252,8 +260,16 @@ class Attachment(SchemaConfigured):
 
     mimeType = mime_type = 'application/vnd.nextthought.rev.attachment'
 
-    def __init__(self, *args, **kwargs):
-        SchemaConfigured.__init__(self, *args, **kwargs)
+    def __setattr__(self, name, value):
+        # This can be done more elegantly with a custom field
+        # and FieldPropertyStoredThroughField
+        if name == "links":
+            try:
+                links = Links(**value)
+                value = links
+            except (TypeError, StandardError):
+                pass
+        return SchemaConfigured.__setattr__(self, name, value)
 
 @NoPickle
 @interface.implementer(IAttachments)

@@ -47,6 +47,10 @@ class TestRevClient(unittest.TestCase):
         url = self.client._orders_url({'orderNumber': 'TC432432'})
         assert_that(url, is_('https://api-sandbox.rev.com/api/v1/orders?orderNumber=TC432432'))
 
+    def test_attachment(self):
+        url = self.client._attachment_url('nm1KN6ROAwAAAAAA')
+        assert_that(url, is_('https://api-sandbox.rev.com/api/v1/attachments/nm1KN6ROAwAAAAAA'))
+
     def test_get_order(self):
         order = self.client.get_order('CP0927624606')
         assert_that(order.order_number, is_('CP0927624606'))
@@ -91,6 +95,10 @@ class TestRevClient(unittest.TestCase):
         orders = self.client.get_orders(client_ref='None')
         assert_that(orders.total_count, is_(0))
         assert_that(orders.orders, is_([]))
+
+    def test_get_attachment(self):
+        attachment = self.client.get_attachment('nm1KN6ROAwAAAAAA')
+        assert_that(attachment.id, is_('nm1KN6ROAwAAAAAA'))
 
 class TestCredentials(unittest.TestCase):
     

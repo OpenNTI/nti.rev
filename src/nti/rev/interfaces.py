@@ -529,7 +529,7 @@ class IAttachment(interface.Interface):
                   required=True)
 
     # FIXME: Indicate this attribute is only included if kind="transcript"
-    audio_length_seconds = Number(title=u'The length (in seconds) of the audio attachment',
+    video_length_seconds = Number(title=u'The length (in seconds) of the audio attachment',
                                   required=False)
 
     links = Object(schema=ILinks,
