@@ -110,7 +110,7 @@ class RevClient(SchemaConfigured):
     def _order_url(self, order_number):
         return (self.url_for_operation('orders') + '/' + order_number)
 
-    def _orders_url(self, params):
+    def _orders_url(self, params={}):
         return self.url_for_operation('orders', params=params)
     
     def _attachment_url(self, attachment_id):
@@ -186,8 +186,6 @@ class RevClient(SchemaConfigured):
 #     def submit_caption_order(self, caption_order_request):
 
 #     def cancel_order(self, ordernum):
-
-#     def get_attachment(self, attachment_id):
 
 #     def get_attachment_content(self, attachment_id, file_format):
 
