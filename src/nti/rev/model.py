@@ -8,6 +8,8 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
+logger = __import__('logging').getLogger(__name__)
+
 from zope import interface
 
 from nti.externalization.persistence import NoPickle
@@ -241,16 +243,29 @@ class Links(SchemaConfigured):
 
     mimeType = mime_type = 'application/vnd.nextthought.rev.links'
     
-    def __setattr__(self, name, value):
-        # This can be done more elegantly with a custom field
-        # and FieldPropertyStoredThroughField
-        try:
-            for x in range(len(value)):
-                link = Link(**value[x])
-                value[x] = link
-        except (TypeError, StandardError):
-            pass
-        return SchemaConfigured.__setattr__(self, name, value)
+    def __init__(self, *args, **kwargs):
+        logger.debug(*args)
+        for x in range(len(args[0])):      
+#         for arg in args[0]:
+            logger.debug(arg)
+            link = Link(**arg)
+            logger.debug(link)
+            links.append(link)
+            logger.debug(links)
+        logger.debug(links)
+        SchemaConfigured.__setattr__(self, 'links', links)
+#         SchemaConfigured.__init__(self, *args, **kwargs)
+#     def __setattr__(self, name, value):
+#         # This can be done more elegantly with a custom field
+#         # and FieldPropertyStoredThroughField
+#         logger.debug('I\'m here')
+#         try:
+#             for x in range(len(value)):
+#                 link = Link(**value[x])
+#                 value[x] = link
+#         except (TypeError, StandardError):
+#             pass
+#         return SchemaConfigured.__setattr__(self, name, value)
 
 @NoPickle
 @interface.implementer(IAttachment)
@@ -265,7 +280,7 @@ class Attachment(SchemaConfigured):
         # and FieldPropertyStoredThroughField
         if name == "links":
             try:
-                links = Links(**value)
+                links = Links(value)
                 value = links
             except (TypeError, StandardError):
                 pass
