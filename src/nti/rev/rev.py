@@ -53,8 +53,6 @@ def _transform_json_results(response, expected_response=200):
         except:
             logger.exception('Unable to get description of error from body.')
             pass
-        if not message:
-            message = 'An unknown error occurred.'
 
         raise RevAPIException(message, error_code=error_code, status_code=response.status_code)
 
