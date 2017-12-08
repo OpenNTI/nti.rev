@@ -37,43 +37,43 @@ class TestRevClient(unittest.TestCase):
 
     def test_baseurl(self):
         assert_that(self.client.BaseURL, is_('https://rev_url/api/v1/'))
-    
+     
     def test_operation_url_construction(self):
         url = self.client.url_for_operation('orders', params={'orderNumber': 'order_number'})
         assert_that(url, is_('https://rev_url/api/v1/orders?orderNumber=order_number'))
-
+ 
     def test_order_url_construction(self):
         url = self.client._order_url('order_number')
         assert_that(url, is_('https://rev_url/api/v1/orders/order_number'))
-
+ 
     def test_orders_url_construction(self):
         # test with no parameters
         url = self.client._orders_url({})
         assert_that(url, is_('https://rev_url/api/v1/orders'))
-        
+         
         # test with one parameter
         url = self.client._orders_url({'ids': 'order_number'})
         assert_that(url, is_('https://rev_url/api/v1/orders?ids=order_number'))
-        
+         
         # test with multiple parameters
         # FIXME: Since python dictionary doesn't necessarily preserve order of keys,
         # url could be https://rev_url/api/v1/orders?page=0&pageSize=25 or https://rev_url/api/v1/orders?pageSize=25&page=0
         url = self.client._orders_url({'page': 0, 'pageSize': 25})
         assert_that(url, is_('https://rev_url/api/v1/orders?page=0&pageSize=25'))
-        
+         
         # test if parameter is None that it is not included in the url
         url = self.client._orders_url({'page': 0, 'ids': None})
         assert_that(url, is_('https://rev_url/api/v1/orders?page=0'))
-
+ 
     def test_attachment_url_construction(self):
         url = self.client._attachment_url('attachment_id')
         assert_that(url, is_('https://rev_url/api/v1/attachments/attachment_id'))
-
+ 
     # TODO: use mock objects
 #     def test_get_order(self):
 #         order = self.client.get_order('CP0927624606')
 #         assert_that(order.order_number, is_('CP0927624606'))
-
+ 
     @fudge.patch('nti.rev.utils.NetSession', 'requests.Response')
     def test_get_orders(self, fake_session, fake_response):
         # create mock response
@@ -113,39 +113,41 @@ class TestRevClient(unittest.TestCase):
                                       'attachments': []
                                   }]
                           }))
-        
+         
         # create mock session
         # expect calling get_orders() with no arguments to call _orders_url() with default params
         (fake_session.expects('get')
                      .with_args(self.client._orders_url({'page':0, 'pageSize':25, 'ids':None, 'clientRef':None}))
                      .returns(fake_response))
         self.client.session = fake_session
-        
+         
         # (see above) test calling get_orders with no arguments uses default params
         orders = self.client.get_orders()
-        
+         
         # test Order object created
         assert_that(isinstance(orders, Orders), is_(True))
-        
+         
         # FIXME: Do I need to test that every Order attribute was assigned correctly?
         assert_that(orders.total_count, is_(2))
     
-# #     @fudge.patch('nti.rev.utils.NetSession', 'requests.Response')
-# #     def test_get_orders_exception(self, fake_session, fake_response):    
-#     def test_get_orders_exception(self):
-# #         (fake_response.has_attr(status_code=400)
-# #                       .expects('json')
-# #                       .returns())
-# #         
-# #         (fake_session.expects('get')
-# #                      .with_args(self.client._orders_url({'page':0, 'pageSize':25, 'ids':'order_number', 'clientRef':'client_ref'}))
-# #                      .returns(fake_response))
-# #         self.client.session = fake_session
-#         
-#         
-#         # test exception raised when both order_number and client_ref are specified
-#         assert_that(calling(self.client.get_orders).with_args(order_number='order_number', client_ref="client_ref"),
-#                     raises(RevAPIException))
+    @fudge.patch('nti.rev.utils.NetSession', 'requests.Response')
+    def test_get_orders_exception(self, fake_session, fake_response):    
+        # create mock response
+        # expect calling json on a response with status code 400 Bad Request and no valid json in the response body will result in a Value Error
+        (fake_response.has_attr(status_code=400)
+                      .expects('json')
+                      .raises(ValueError))
+        
+        # create mock session
+        # expect making a request with both order_number and client_ref specified will result in a response with status code 400 Bad Request
+        (fake_session.expects('get')
+                     .with_args(self.client._orders_url({'page':0, 'pageSize':25, 'ids':'order_number', 'clientRef':'client_ref'}))
+                     .returns(fake_response))
+        self.client.session = fake_session
+         
+        # test exception raised when both order_number and client_ref are specified
+        assert_that(calling(self.client.get_orders).with_args(order_number='order_number', client_ref="client_ref"),
+                    raises(RevAPIException))
 
 #     def test_get_attachment(self):
 #         attachment = self.client.get_attachment('nm1KN6ROAwAAAAAA')
