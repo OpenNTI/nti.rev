@@ -37,11 +37,13 @@ class TestRevClient(unittest.TestCase):
 
     def test_baseurl(self):
         assert_that(self.client.BaseURL, is_('https://rev_url/api/v1/'))
-     
+    
+    # TODO: test more extensively?
     def test_operation_url_construction(self):
         url = self.client.url_for_operation('orders', params={'orderNumber': 'order_number'})
         assert_that(url, is_('https://rev_url/api/v1/orders?orderNumber=order_number'))
  
+    # TODO: test more extensively?
     def test_order_url_construction(self):
         url = self.client._order_url('order_number')
         assert_that(url, is_('https://rev_url/api/v1/orders/order_number'))
@@ -65,11 +67,12 @@ class TestRevClient(unittest.TestCase):
         url = self.client._orders_url({'page': 0, 'ids': None})
         assert_that(url, is_('https://rev_url/api/v1/orders?page=0'))
  
+    # TODO: test more extensively?
     def test_attachment_url_construction(self):
         url = self.client._attachment_url('attachment_id')
         assert_that(url, is_('https://rev_url/api/v1/attachments/attachment_id'))
  
-    # TODO: use mock objects
+#     # TODO: use mock objects
 #     def test_get_order(self):
 #         order = self.client.get_order('CP0927624606')
 #         assert_that(order.order_number, is_('CP0927624606'))
@@ -149,6 +152,7 @@ class TestRevClient(unittest.TestCase):
         assert_that(calling(self.client.get_orders).with_args(order_number='order_number', client_ref="client_ref"),
                     raises(RevAPIException))
 
+#     # TODO: use mock objects
 #     def test_get_attachment(self):
 #         attachment = self.client.get_attachment('nm1KN6ROAwAAAAAA')
 #         assert_that(attachment.id, is_('nm1KN6ROAwAAAAAA'))
