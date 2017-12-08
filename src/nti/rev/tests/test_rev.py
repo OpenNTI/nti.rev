@@ -24,6 +24,7 @@ from nti.rev import rev_client
 from nti.rev.interfaces import RevAPIException
 
 from nti.rev.model import Credentials
+from nti.rev.model import Orders
 
 from nti.rev.rev import RevClient
 
@@ -37,30 +38,45 @@ class TestRevClient(unittest.TestCase):
     def test_baseurl(self):
         assert_that(self.client.BaseURL, is_('https://rev_url/api/v1/'))
     
-    def test_operation_construction(self):
+    def test_operation_url_construction(self):
         url = self.client.url_for_operation('orders', params={'orderNumber': 'order_number'})
         assert_that(url, is_('https://rev_url/api/v1/orders?orderNumber=order_number'))
 
-    def test_order(self):
+    def test_order_url_construction(self):
         url = self.client._order_url('order_number')
         assert_that(url, is_('https://rev_url/api/v1/orders/order_number'))
 
-    def test_orders(self):
-        url = self.client._orders_url({'orderNumber': 'order_number'})
-        assert_that(url, is_('https://rev_url/api/v1/orders?orderNumber=order_number'))
+    def test_orders_url_construction(self):
+        # test with no parameters
+        url = self.client._orders_url({})
+        assert_that(url, is_('https://rev_url/api/v1/orders'))
+        
+        # test with one parameter
+        url = self.client._orders_url({'ids': 'order_number'})
+        assert_that(url, is_('https://rev_url/api/v1/orders?ids=order_number'))
+        
+        # test with multiple parameters
+        # FIXME: Since python dictionary doesn't necessarily preserve order of keys,
+        # url could be https://rev_url/api/v1/orders?page=0&pageSize=25 or https://rev_url/api/v1/orders?pageSize=25&page=0
+        url = self.client._orders_url({'page': 0, 'pageSize': 25})
+        assert_that(url, is_('https://rev_url/api/v1/orders?page=0&pageSize=25'))
+        
+        # test if parameter is None that it is not included in the url
+        url = self.client._orders_url({'page': 0, 'ids': None})
+        assert_that(url, is_('https://rev_url/api/v1/orders?page=0'))
 
-    def test_attachment(self):
+    def test_attachment_url_construction(self):
         url = self.client._attachment_url('attachment_id')
         assert_that(url, is_('https://rev_url/api/v1/attachments/attachment_id'))
 
-    # TODO: use mock object
+    # TODO: use mock objects
 #     def test_get_order(self):
 #         order = self.client.get_order('CP0927624606')
 #         assert_that(order.order_number, is_('CP0927624606'))
 
     @fudge.patch('nti.rev.utils.NetSession', 'requests.Response')
     def test_get_orders(self, fake_session, fake_response):
-
+        # create mock response
         (fake_response.has_attr(status_code=200)
                       .expects('json')
                       .returns(
@@ -97,53 +113,39 @@ class TestRevClient(unittest.TestCase):
                                       'attachments': []
                                   }]
                           }))
-
+        
+        # create mock session
+        # expect calling get_orders() with no arguments to call _orders_url() with default params
         (fake_session.expects('get')
-                     .with_args(self.client._orders_url({'page':0, 'pageSize':25}))
+                     .with_args(self.client._orders_url({'page':0, 'pageSize':25, 'ids':None, 'clientRef':None}))
                      .returns(fake_response))
         self.client.session = fake_session
         
+        # (see above) test calling get_orders with no arguments uses default params
         orders = self.client.get_orders()
         
-        # TODO: really testing building url, move some of these tests to test_orders
-        # test default values if no arguments specified
-        assert_that(orders.page, is_(0))
-        assert_that(orders.results_per_page, is_(25))
+        # test Order object created
+        assert_that(isinstance(orders, Orders), is_(True))
         
-#         # test arguments specified
-#         orders = self.client.get_orders(page=2, results_per_page=10)
-#         assert_that(orders.page, is_(2))
-#         assert_that(orders.results_per_page, is_(10))
+        # FIXME: Do I need to test that every Order attribute was assigned correctly?
+        assert_that(orders.total_count, is_(2))
+    
+# #     @fudge.patch('nti.rev.utils.NetSession', 'requests.Response')
+# #     def test_get_orders_exception(self, fake_session, fake_response):    
+#     def test_get_orders_exception(self):
+# #         (fake_response.has_attr(status_code=400)
+# #                       .expects('json')
+# #                       .returns())
+# #         
+# #         (fake_session.expects('get')
+# #                      .with_args(self.client._orders_url({'page':0, 'pageSize':25, 'ids':'order_number', 'clientRef':'client_ref'}))
+# #                      .returns(fake_response))
+# #         self.client.session = fake_session
 #         
-#         # test results_per_page set to default if argument specified is out of bounds
-#         orders = self.client.get_orders(results_per_page=4)
-#         assert_that(orders.results_per_page, is_(25))
-# 
-#         orders = self.client.get_orders(results_per_page=101)
-#         assert_that(orders.results_per_page, is_(25))
-# 
-#         # test only orders matching specified order_number are retrieved
-#         orders = self.client.get_orders(order_number='CP0927624606')
-#         for order in orders.orders:
-#             assert_that(order.order_number, is_('CP0927624606'))
-#         
-#         # test only orders matching specified client_ref are retrieved
-#         orders = self.client.get_orders(client_ref='myref1')
-#         for order in orders.orders:
-#             assert_that(order.client_ref, is_('myref1'))
 #         
 #         # test exception raised when both order_number and client_ref are specified
-#         assert_that(calling(self.client.get_orders).with_args(order_number='CP0927624606', client_ref="myref1"),
+#         assert_that(calling(self.client.get_orders).with_args(order_number='order_number', client_ref="client_ref"),
 #                     raises(RevAPIException))
-# 
-#         # test no orders found matching specified order_number or client_ref
-#         orders = self.client.get_orders(order_number=0)
-#         assert_that(orders.total_count, is_(0))
-#         assert_that(orders.orders, is_([]))
-#         
-#         orders = self.client.get_orders(client_ref='None')
-#         assert_that(orders.total_count, is_(0))
-#         assert_that(orders.orders, is_([]))
 
 #     def test_get_attachment(self):
 #         attachment = self.client.get_attachment('nm1KN6ROAwAAAAAA')
