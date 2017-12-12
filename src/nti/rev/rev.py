@@ -17,6 +17,8 @@ from requests.exceptions import ConnectionError
 from zope import component
 from zope import interface
 
+from nti.externalization.internalization import update_from_external_object
+
 from nti.schema.fieldproperty import createDirectFieldProperties
 
 from nti.schema.schema import SchemaConfigured
@@ -153,9 +155,21 @@ class RevClient(SchemaConfigured):
 
         result = _transform_json_results(response)
         logger.debug('Received response from Rev %s', result)
+        
+        # update_from_external_object
+        orders = Orders()
+        
+        # Add MimeType to each order
+        for order in result['orders']:
+            order['MimeType'] = 'application/vnd.nextthought.rev.order'
+            
+            # Add MimeType to order caption
+            if 'caption' in order:
+                order['caption']['MimeType'] = 'application/vnd.nextthought.rev.caption'
 
-        # Create and return Orders object providing IOrders interface from the response JSON
-        return Orders(**result)
+#         from IPython.core.debugger import Tracer;Tracer()()
+
+        return update_from_external_object(orders, result)
 
     def get_attachment(self, attachment_id):
         url = self._attachment_url(attachment_id)
