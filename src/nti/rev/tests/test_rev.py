@@ -32,6 +32,8 @@ from nti.rev.tests import SharedConfiguringTestLayer
 
 class TestRevClient(unittest.TestCase):
 
+    layer = SharedConfiguringTestLayer
+
     def setUp(self):
         self.client = RevClient(BaseURL=str('https://rev_url/api/v1/'), credentials=Credentials(client_api_key='client_api_key', user_api_key='user_api_key'))
 
