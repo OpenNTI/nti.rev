@@ -24,19 +24,42 @@ from nti.schema.field import DateTime
 from nti.schema.field import TextLine
 from nti.schema.field import ValidURI
 
+class RevException(Exception):
+    pass
+
+class RevUnreachableException(RevException):
+    """
+    Raised when the Rev system cannot be reached
+    """
+
+class RevAPIException(RevException):
+    """
+    Raised when an error occurs communicating with the Rev API
+    """
+    error_code = None   # Numeric error code specified by Rev
+    status_code = None
+
+    def __init__(self, message, error_code=None, status_code=None):
+        super(RevAPIException, self).__init__(message)
+        
+        self.error_code = error_code
+        self.status_code = status_code
 
 class IRevClient(interface.Interface):
     """
-    Handles Rev order operations.
+    Properties and functions for working with the Rev API
     """
+    
+    BaseURL = HTTPURL(title=u'The BaseURL for this Rev endpoint',
+                      required=True)
 
-    def __init__(authorization):
+    def __init__(BaseURL, credentials):
         """
         Args:
-            authorization (:obj:`IAuthorization`): The client and user API keys.
+            BaseURL (str): The Base URL for this Rev endpoint
+            credentials (:obj:`ICredentials`): The client and user API keys.
         
         """
-
 
     def upload_source_file(source_file_upload):
         """
@@ -131,19 +154,20 @@ class IRevClient(interface.Interface):
             
         """
 
-    def get_orders(pagenum=1, pageSize=25, orderNumber=None, referenceId=None):
+    def get_orders(page=0, results_per_page=25, order_number=None, client_ref=None):
         """
         Get the paged list IOrders for user, optionally getting orders with specific order number or reference ID.
         
         Args:
-            pagenum (int, optional): The number of the page of orders to return. Defaults to page 1.
-            pageSize (int, optional): The number of orders per page to return. Page size must be between 5 and 100.
+            page (int, optional): The number of the page of orders to return. Defaults to page 0.
+            results_per_page (int, optional): The number of orders per page to return.
                 Defaults to 25 orders per page.
-            orderNumber (str, optional): The order number of the order to retrieve. 
-                Must not be specified if clientRef is specified. 
+                Page size must be between 5 and 100, else defaults to 25 orders per page.
+            order_number (str, optional): The order number of the order to retrieve. 
+                Must not be specified if client_ref is specified. 
                 Defaults to returning all orders.
-            referenceId (str, optional): The reference ID as used in your application of the order to retrieve.
-                Must not be specified if orderNumber is specified.
+            client_ref (str, optional): The reference ID as used in your application of the order to retrieve.
+                Must not be specified if order_number is specified.
                 Defaults to returning all orders.
         
         Returns:
@@ -156,7 +180,7 @@ class IRevClient(interface.Interface):
                 To get those, call get_order(ordernum) with the appropriate order number.
                 
         Raises:
-            OrderNumberAndReferenceIdSpecified: If both orderNumber and referenceId are specified.
+            RevAPIException: If both order_number and client_ref are specified.
         
         """
 
@@ -223,7 +247,7 @@ class IClientAPIKey(interface.Interface):
     A secret key specific to each partner that wishes to use the Rev API
     """
     
-    client_API_key = TextLine(title=u'The client API key',
+    client_api_key = TextLine(title=u'The client API key',
                               description=u"""This is a secret key specific to each partner 
                               that wishes to use the Rev API.""",
                               required=True)
@@ -234,17 +258,25 @@ class IUserAPIKey(interface.Interface):
     A secret key specific to a Rev user
     """
     
-    user_API_key = TextLine(title=u'The user API key',
+    user_api_key = TextLine(title=u'The user API key',
                             description=u"""This is a secret key specific to a Rev user, 
                             which identifies the user account under whose privileges 
                             the requested operation executes.""",
                             required=True)
 
 
-class IAuthorization(IClientAPIKey, IUserAPIKey):
+class ICredentials(IClientAPIKey, IUserAPIKey):
     """
     Security and authentication keys used to access the Rev API
     """
+
+
+class IRevRoot(interface.Interface):
+    """
+    The Rev endpoint root
+    """
+    BaseURL = HTTPURL(title=u'The BaseURL for this Rev endpoint',
+                      required=True)
 
 
 class ISourceFileUpload(interface.Interface):
@@ -331,8 +363,7 @@ MONOLOGUE_ELEMENT_TYPE_ITEMS = (MONOLOGUE_ELEMENT_TYPE_TEXT,
                                 MONOLOGUE_ELEMENT_TYPE_TAG)
 
 MONOLOGUE_ELEMENT_TYPE_VOCABULARY = SimpleVocabulary(
-    [SimpleTerm(_x) for _x in MONOLOGUE_ELEMENT_TYPE_ITEMS]
-)
+    [SimpleTerm(_x) for _x in MONOLOGUE_ELEMENT_TYPE_ITEMS])
 
 
 class IMonologueElement(interface.Interface):
@@ -416,16 +447,17 @@ class IComment(interface.Interface):
     text = Text(title=u'The text of the comment',
                 required=True)
 
+# (the default) A notification is sent only when the order is complete
+NOTIFICATION_FINAL_ONLY = u'FinalOnly'
 
-NOTIFICATION_FINAL_ONLY = u'(the default) A notification is sent only when the order is complete'
-NOTIFICATION_DETAILED = u'A notification is sent whenever the order is in a new status or has a new comment'
+# A notification is sent whenever the order is in a new status or has a new comment
+NOTIFICATION_DETAILED = u'Detailed'
 
 NOTIFICATION_ITEMS = (NOTIFICATION_DETAILED,
                       NOTIFICATION_FINAL_ONLY)
 
 NOTIFICATION_VOCABULARY = SimpleVocabulary(
-    [SimpleTerm(_x) for _x in NOTIFICATION_ITEMS]
-)
+    [SimpleTerm(_x) for _x in NOTIFICATION_ITEMS])
 
 
 class INotification(interface.Interface):
@@ -474,8 +506,7 @@ ATTACHMENT_KIND_ITEMS = (ATTACHMENT_KIND_MEDIA,
                          ATTACHMENT_KIND_CAPTION)
 
 ATTACHMENT_KIND_VOCABULARY = SimpleVocabulary(
-    [SimpleTerm(_x) for _x in ATTACHMENT_KIND_ITEMS]
-)
+    [SimpleTerm(_x) for _x in ATTACHMENT_KIND_ITEMS])
 
 
 class IAttachment(interface.Interface):
@@ -498,7 +529,7 @@ class IAttachment(interface.Interface):
                   required=True)
 
     # FIXME: Indicate this attribute is only included if kind="transcript"
-    audio_length_seconds = Number(title=u'The length (in seconds) of the audio attachment',
+    video_length_seconds = Number(title=u'The length (in seconds) of the audio attachment',
                                   required=False)
 
     links = Object(schema=ILinks,
@@ -543,11 +574,41 @@ class IOrderRequest(interface.Interface):
                           required=False)
 
 
-#: Completed and Cancelled are the only status values guaranteed not to
-#: change in v1 of the API.
+class ICaption(interface.Interface):
+    """
+    Caption details for a caption order
+    including total length of the audio of media attachments for the order
+    """
+
+    total_length = Number(title=u'The total length',
+                          required = True)
+
+    total_length_seconds = Number(title=u'The total length (in seconds) of the videos included in the caption order',
+                                  required=True)
 
 
-ORDER_STATUS_COMPLETED = u'Completed'
+class ITranscription(interface.Interface):
+    """
+    Transcription details for a transcription order
+    including total length of the audio of media attachments for the order
+    and additional services
+    """
+
+    total_length_seconds = Number(title=u'Total length of the audio (in seconds) of media attachments for an order',
+                                  required=True)
+
+    verbatim = Bool(title=u'The transcription is verbatim',
+                    description=u"""If true, all filler words (i.e. umm, huh) are included in the transcription""",
+                    required=True)
+
+    timestamps = Bool(title=u'Timestamps are included in the transcription',
+                      required=True)
+
+
+# Completed and Cancelled are the only status values guaranteed not to
+# change in v1 of the API.
+
+ORDER_STATUS_COMPLETE = u'Complete'
 ORDER_STATUS_CANCELLED = u'Cancelled'
 ORDER_STATUS_CAPTIONING = u'Captioning'
 ORDER_STATUS_IN_PROGRESS = u'In Progress'
@@ -556,12 +617,23 @@ ORDER_STATUS_TRANSCRIBING = u'Transcribing'
 ORDER_STATUS_ITEMS = (ORDER_STATUS_TRANSCRIBING,
                       ORDER_STATUS_CAPTIONING,
                       ORDER_STATUS_IN_PROGRESS,
-                      ORDER_STATUS_COMPLETED,
+                      ORDER_STATUS_COMPLETE,
                       ORDER_STATUS_CANCELLED)
 
 ORDER_STATUS_VOCABULARY = SimpleVocabulary(
-    [SimpleTerm(_x) for _x in ORDER_STATUS_ITEMS]
-)
+    [SimpleTerm(_x) for _x in ORDER_STATUS_ITEMS])
+
+
+# TODO: Determine additional possible priorities
+
+ORDER_PRIORITY_NORMAL = u'Normal'
+ORDER_PRIORITY_TIMEINSENSITIVE = u'TimeInsensitive'
+
+ORDER_PRIORITY_ITEMS = (ORDER_PRIORITY_NORMAL,
+                        ORDER_PRIORITY_TIMEINSENSITIVE)
+
+ORDER_PRIORITY_VOCABULARY = SimpleVocabulary(
+    [SimpleTerm(_x) for _x in ORDER_PRIORITY_ITEMS])
 
 
 class IOrderDetails(interface.Interface):
@@ -572,6 +644,7 @@ class IOrderDetails(interface.Interface):
     order_number = TextLine(title=u'Rev assigned order number',
                             required=True)
 
+    # FIXME: client_ref included in both IOrderRequest and IOrderDetails
     client_ref = TextLine(title=u'The client reference order number provided with the order request',
                           required=True)
 
@@ -585,6 +658,28 @@ class IOrderDetails(interface.Interface):
                     title=u'The status of the order',
                     required=True)
 
+    priority = Choice(vocabulary=ORDER_PRIORITY_VOCABULARY,
+                      title=u'The priority of the order',
+                      required=True)
+
+    non_standard_tat_guarantee = Bool(title=u'Normal turnaround time is not needed',
+                                      description=u"""By default, normal turnaround time (false) is assumed.
+                                      Note that this value is used as a guideline only.""",
+                                      required=False)
+    
+    # FIXME: Required for ICaptionOrderDetails
+    caption = Object(schema=ICaption,
+                     title=u'Caption details for the caption order',
+                     description=u"""Total length (in seconds) of the videos included in the caption order""",
+                     required=False)
+    
+    # FIXME: Required for ITranscriptionOrderDetails
+    transcription = Object(schema=ITranscription,
+                           title=u'Transcription details for the transcription order',
+                           description=u"""Total length of the audio (in seconds) of media attachments for the order 
+                           and additional services""",
+                           required=False)
+    
     attachments = List(value_type=Object(IAttachment),
                        title=u'The attachments with the order',
                        required=True)
@@ -604,6 +699,16 @@ class IOrders(interface.Interface):
     """
     A list of orders
     """
+
+    total_count = Number(title=u'The total number of orders',
+                         required=True)
+
+    results_per_page = Number(title=u'The number of results returned in each page',
+                              required=True)
+
+    page = Number(title=u'The number of the page returned',
+                  description=u'Page numbering is 0-based',
+                  required=True)
 
     orders = List(value_type=Object(IOrder),
                   title=u'A list of orders',
@@ -642,16 +747,6 @@ class ITranscriptionOrderRequest(IOrderRequest):
                                    description=u"""Provides information on what needs to be transcribed 
                                    and allows for any transcription options to be set""",
                                    required=True)
-
-
-class ICaption(interface.Interface):
-    """
-    Caption details for a caption order
-    including total length of the audio of media attachments for the order
-    """
-
-    total_length_seconds = Number(title=u'The total length (in seconds) of the videos included in the caption order',
-                                  required=True)
 
 
 class ICaptionOrderDetails(IOrderDetails):
@@ -770,25 +865,6 @@ class ICaptionOrder(ICaptionOrderRequest, ICaptionOrderDetails, IOrder):
     """
     A caption order
     """
-
-
-class ITranscription(interface.Interface):
-    """
-    Transcription details for a transcription order
-    including total length of the audio of media attachments for the order
-    and additional services
-    """
-
-    total_length_seconds = Number(title=u'Total length of the audio (in seconds) of media attachments for an order',
-                                  required=True)
-
-    verbatim = Bool(title=u'The transcription is verbatim',
-                    description=u"""If true, all filler words (i.e. umm, huh) are included in the transcription""",
-                    required=True)
-
-    timestamps = Bool(title=u'Timestamps are included in the transcription',
-                      required=True)
-
 
 class ITranscriptionOrderDetails(IOrderDetails):
     """

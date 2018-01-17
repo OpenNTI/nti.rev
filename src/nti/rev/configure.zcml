@@ -1,11 +1,68 @@
 <!-- -*- mode: nxml -*- -->
 <configure  xmlns="http://namespaces.zope.org/zope"
             xmlns:i18n="http://namespaces.zope.org/i18n"
-            xmlns:zcml="http://namespaces.zope.org/zcml">
+            xmlns:zcml="http://namespaces.zope.org/zcml"
+            xmlns:rev="http://nextthought.com/ntp/rev"
+            xmlns:ext="http://nextthought.com/ntp/ext">
 
     <include package="zope.component" file="meta.zcml" />
     <include package="zope.security" file="meta.zcml" />
     <include package="zope.component" />
 	<include package="zope.security" />
-	 
+
+	<!-- Credentials -->
+	<include package="." file="meta.zcml" />
+
+	<configure>
+		<rev:registerCredentials
+			client_api_key="qClt2chhujNEX6QXPHXmqzt9z3k"
+			user_api_key="AAAOiFQ21PgbaVUDAU1tYH2ZEV8= " />
+
+		<rev:registerRevEndpoint
+			base="https://api-sandbox.rev.com/api/v1/" />
+	</configure>
+	
+	<utility factory=".rev.rev_client_factory"
+			 provides=".interfaces.IRevClient"/>
+
+	<!-- Externalization -->
+	<include package="nti.externalization" file="meta.zcml" />
+	<include package="nti.externalization" />
+	<ext:registerAutoPackageIO
+		root_interfaces=".interfaces.IClientAPIKey
+						 .interfaces.IUserAPIKey
+						 .interfaces.ICredentials
+						 .interfaces.ISourceFileUpload
+						 .interfaces.IInput
+						 .interfaces.ISourceFileInput
+						 .interfaces.IExternalLinkInput
+						 .interfaces.ISpeaker
+						 .interfaces.ISpeakers
+						 .interfaces.IMonologueElement
+						 .interfaces.IMonologueElements
+						 .interfaces.IMonologue
+						 .interfaces.IMonologues
+						 .interfaces.IComment
+						 .interfaces.INotification
+						 .interfaces.ILink
+						 .interfaces.ILinks
+						 .interfaces.IAttachment
+						 .interfaces.IAttachments
+						 .interfaces.IAttachmentContent
+						 .interfaces.IOrderRequest
+						 .interfaces.IOrderDetails
+						 .interfaces.IOrder
+						 .interfaces.IOrders
+						 .interfaces.ITranscriptionOptions
+						 .interfaces.ITranscriptionOrderRequest
+						 .interfaces.ICaption
+						 .interfaces.ICaptionOrderDetails
+						 .interfaces.ICaptionOptions
+						 .interfaces.ICaptionOrderRequest
+						 .interfaces.ICaptionOrder
+						 .interfaces.ITranscription
+						 .interfaces.ITranscriptionOrderDetails
+						 .interfaces.ITranscriptionOrder"
+		modules=".model" />
+
 </configure>
